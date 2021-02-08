@@ -1,25 +1,25 @@
-import logo from './logo.svg';
+import { useState, useEffect } from 'react';
+
+import Header from './components/Header';
 import './App.css';
 
-function App() {
+const App = () => {
+  const [profile, updateProfile] = useState(null);
+
+  useEffect(() => {
+    fetch(`${process.env.REACT_APP_SERVER_URL}/auth/account`,
+      { credentials: 'include' })
+    .then(res => res.json())
+    .then(account => {
+      if (Object.keys(account).length > 0) updateProfile(account);
+    })
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <>
+      <Header profile={profile} />
+    </>
+  )
 }
 
 export default App;
