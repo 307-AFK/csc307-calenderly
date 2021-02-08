@@ -65,7 +65,15 @@ passport.use(new GoogleStrategy({
 }));
 
 /* Auth Routes */
-app.get('/auth/account', (req, res) => res.json(req.user || {}));
+app.get('/auth/account', (req, res) => {
+  const account = req.user ? {
+    name: req.user.name,
+    email: req.user.email,
+    picture: req.user.picture,
+  } : null;
+
+  res.json(account || {});
+});
 
 app.get('/auth/google',
   passport.authenticate('google', { scope: ['profile', 'email'] }));
