@@ -10,7 +10,8 @@ const eventSchema = new mongoose.Schema({
   description: String,
   interviewers: [{ type: Schema.Types.ObjectId, ref: 'User'}],
   startDate: Date,
-  endDate: Date
+  endDate: Date,
+  interviewersNeeded: Number
 });
 
 module.exports = mongoose.model('Event', eventSchema);
