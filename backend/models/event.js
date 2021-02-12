@@ -1,17 +1,33 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const User = require('./User');
+
+const interviewerSchema = new mongoose.Schema({
+   userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      unique: true,
+   },
+   availability: [Boolean],
+});
+
+const intervieweeSchema = new mongoose.Schema({
+   userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      unique: true,
+   },
+   timeChosen: Date,
+});
 
 const eventSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-  },
+  title: String,
   description: String,
-  interviewers: [{ type: Schema.Types.ObjectId, ref: 'User'}],
+  interviewers: [interviewerSchema],
+  interviewees: [intervieweeSchema],
   startDate: Date,
   endDate: Date,
-  interviewersNeeded: Number
+  interviewersNeeded: Number,
+  availabilityIncrement: Number,
 });
 
 module.exports = mongoose.model('Event', eventSchema);
