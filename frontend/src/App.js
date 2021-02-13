@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 
 import Header from './components/Header';
-import './App.css';
+import { Button } from 'antd';
+import './App.less';
 
 const App = () => {
   const [profile, updateProfile] = useState(null);
@@ -18,6 +19,7 @@ const App = () => {
   return (
     <>
       <Header profile={profile} />
+      <Button type='primary'>Hello!</Button>
     </>
   )
 }
