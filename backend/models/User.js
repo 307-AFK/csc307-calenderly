@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+
+const { Schema } = mongoose;
 const passportLocalMongoose = require('passport-local-mongoose');
 const findOrCreate = require('mongoose-findorcreate');
 
@@ -9,7 +10,7 @@ const userSchema = new mongoose.Schema({
   picture: String,
   googleId: String,
   secret: String,
-  events: [{ type: Schema.Types.ObjectId, ref: 'Event'}],
+  events: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
 });
 
 userSchema.plugin(passportLocalMongoose);

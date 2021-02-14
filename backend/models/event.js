@@ -1,22 +1,23 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+
+const { Schema } = mongoose;
 
 const interviewerSchema = new mongoose.Schema({
-   userId: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      unique: true,
-   },
-   availability: [Boolean],
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    unique: true,
+  },
+  availability: [Boolean],
 });
 
 const intervieweeSchema = new mongoose.Schema({
-   userId: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      unique: true,
-   },
-   timeChosen: Date,
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    unique: true,
+  },
+  timeChosen: Date,
 });
 
 const eventSchema = new mongoose.Schema({

@@ -1,11 +1,15 @@
 const express = require('express');
 const session = require('express-session');
+const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 require('dotenv').config();
 
 const app = express();
+app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 const User = require('./models/User');
 
@@ -19,8 +23,6 @@ mongoose.connect(process.env.DATABASE_URL, {
   useFindAndModify: false,
   useCreateIndex: true,
 }).then(() => console.log('Connected to MongoDB'));
-
-app.use(express.json());
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL);
