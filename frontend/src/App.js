@@ -1,7 +1,18 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
-import Header from './components/Header';
-import './App.css';
+// components
+import { Layout } from 'antd';
+import Sidebar from './components/Sidebar';
+import Card from './components/Card';
+
+// pages
+import Login from './pages/Login';
+import Profile from './pages/Profile';
+
+import './App.less';
+
+const { Content } = Layout;
 
 const App = () => {
   const [profile, updateProfile] = useState(null);
@@ -16,10 +27,27 @@ const App = () => {
   }, []);
 
   return (
-    <>
-      <Header profile={profile} />
-    </>
-  )
+    <BrowserRouter>
+      { profile ? (
+          <Card width={16}>
+            <Layout>
+              <Sidebar />
+              <Content>
+                <Switch>
+                  <Route exact path='/'>
+                    events!
+                  </Route>
+                  <Route path='/profile'>
+                    <Profile user={profile} />
+                  </Route>
+                </Switch>
+              </Content>
+            </Layout>
+          </Card>
+        ) : <Login />
+      }
+    </BrowserRouter>
+  );
 }
 
 export default App;
