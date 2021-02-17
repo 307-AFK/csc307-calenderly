@@ -9,6 +9,8 @@ import Card from './components/Card';
 // pages
 import Login from './pages/Login';
 import Profile from './pages/Profile';
+import Events from './pages/Events'
+import CreateEvent from './pages/CreateEvent'
 
 import './App.less';
 
@@ -35,10 +37,13 @@ const App = () => {
               <Content>
                 <Switch>
                   <Route exact path='/'>
-                    events!
+                    <Events />
                   </Route>
                   <Route path='/profile'>
                     <Profile user={profile} />
+                  </Route>
+                  <Route path='/create'>
+                    <CreateEvent user={profile} />
                   </Route>
                 </Switch>
               </Content>

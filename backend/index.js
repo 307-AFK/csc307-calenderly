@@ -70,6 +70,8 @@ passport.use(new GoogleStrategy({
 /* Auth Routes */
 app.get('/auth/account', (req, res) => {
   const account = req.user ? {
+    // eslint-disable-next-line no-underscore-dangle
+    id: req.user._id,
     name: req.user.name,
     email: req.user.email,
     picture: req.user.picture,
