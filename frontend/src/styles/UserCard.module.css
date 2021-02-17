@@ -1,0 +1,12 @@
+.userCard {
+  display: flex;
+  align-items: center;
+}
+
+.name {
+  padding-right: 5px;
+}
+
+.profPhoto {
+  border-radius: 50%;
+}
