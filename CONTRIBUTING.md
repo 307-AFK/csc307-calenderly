@@ -27,5 +27,5 @@ We are using the [Airbnb JS style guide](https://github.com/airbnb/javascript)
 with ESLint, with a couple of extra rules found in the `.eslintrc.json` files.
 
 To actually run the linter while you are editing, check out the [ESLint
-Integrations] (https://eslint.org/docs/user-guide/integrations) page. You
+Integrations](https://eslint.org/docs/user-guide/integrations) page. You
 should be able to find your editor here. If not, use one of these editors.
