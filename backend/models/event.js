@@ -6,7 +6,6 @@ const interviewerSchema = new mongoose.Schema({
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    unique: true,
   },
   availability: [Boolean],
 });
@@ -15,7 +14,6 @@ const intervieweeSchema = new mongoose.Schema({
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    unique: true,
   },
   timeChosen: Date,
 });

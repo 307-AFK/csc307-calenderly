@@ -8,8 +8,8 @@ const Card = (props) => {
   const { width, children } = props;
 
   return (
-    <Row justify="center">
-      <Col md={width} sm={18} xs={20} className="card">
+    <Row justify='center'>
+      <Col md={width} sm={18} xs={20} className='card'>
         { children }
       </Col>
     </Row>

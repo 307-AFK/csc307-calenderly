@@ -42,7 +42,7 @@ module.exports.getEventInterviewers = async (req, res) => {
 
 module.exports.createEvent = async (req, res) => {
   const eventCreator = {
-    userId: req.body.eventCreator,
+    userId: mongoose.Types.ObjectId(req.body.eventCreator),
   };
   const newEvent = new Event({
     title: req.body.title,
