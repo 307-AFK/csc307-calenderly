@@ -28,8 +28,8 @@ jobs:
 
     - name: Check the linter
       working-directory: ./backend
-      run: yarn run eslint ./
+      run: yarn lint
     
     - name: Run tests
       working-directory: ./backend
-      run: yarn test
+      run: yarn run jest
