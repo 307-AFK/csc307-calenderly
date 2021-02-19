@@ -9,10 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
-    defaults:
-      run:
-        working-directory: ./backend
 
     strategy:
       matrix:
@@ -27,16 +23,13 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: Install dependencies
-      uses: borales/actions-yarn@v2.0.0
-      with:
-        cmd: install
+      working-directory: ./backend
+      run: yarn install
 
     - name: Check the linter
-      uses: borales/actions-yarn@v2.0.0
-      with:
-        cmd: run eslint ./
+      working-directory: ./backend
+      run: yarn run eslint ./
     
     - name: Run tests
-      uses: borales/actions-yarn@v2.0.0
-      with:
-        cmd: test
+      working-directory: ./backend
+      run: yarn test
