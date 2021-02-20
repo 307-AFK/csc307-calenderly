@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Event = require('../models/Event');
+const User = require('../models/User');
 
 module.exports.getEvents = async (req, res) => {
   const events = await Event.find();
@@ -53,21 +54,39 @@ module.exports.createEvent = async (req, res) => {
     interviewersNeeded: req.body.interviewersNeeded,
     availabilityIncrement: req.body.availabilityIncrement,
   });
-  newEvent.save((err) => {
-    if (err) {
-      res.status(404).send('Couldn\'t create event');
+  // save event
+  newEvent.save().then((event) => {
+    if (event) {
+      // add this event to the creator's list of events
+      User.findOneAndUpdate(
+        { _id: mongoose.Types.ObjectId(req.body.eventCreator) },
+        { $push: { events: newEvent._id } },
+      ).then((user) => {
+        if (user) {
+          res.status(201).send(event);
+        } else {
+          res.status(404).send('Created event, but couldn\'t update user');
+        }
+      });
     } else {
-      res.status(201).send(newEvent);
+      res.status(404).send('Couldn\'t create event');
     }
   });
 };
 
 module.exports.deleteEvent = async (req, res) => {
-  Event.findByIdAndDelete(req.params.eventid, (err) => {
-    if (err) {
-      res.status(404).send('Couldn\'t delete event');
+  // delete the event
+  Event.findByIdAndDelete(req.params.eventid).then((deletedEvent) => {
+    if (deletedEvent) {
+      // delete all references to the event in User collection
+      User.updateMany(
+        { events: req.params.eventid },
+        { $pull: { events: req.params.eventid } },
+      ).then(() => {
+        res.status(204).send('Event deleted');
+      });
     } else {
-      res.status(204).send('Item deleted');
+      res.status(404).send('Couldn\'t delete event');
     }
   });
 };
