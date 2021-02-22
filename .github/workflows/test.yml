@@ -7,7 +7,7 @@ on:
     branches: [ dev ]
     
 jobs:
-  build:
+  backend_tests:
     runs-on: ubuntu-latest
 
     strategy:
@@ -38,3 +38,26 @@ jobs:
         GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
         GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
       run: yarn run jest
+
+  frontend_tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x, 14.x, 15.x]
+    
+    steps:
+    - users: actions/checkout@v2
+
+    - name: Node version ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: yarn install
+
+    - name: Check the linter
+      working-directory: ./frontend
+      run: yarn lint
