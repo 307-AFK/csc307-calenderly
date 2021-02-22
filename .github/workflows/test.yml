@@ -32,4 +32,9 @@ jobs:
     
     - name: Run tests
       working-directory: ./backend
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+        GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+        GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
       run: yarn run jest
