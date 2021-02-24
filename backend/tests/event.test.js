@@ -80,11 +80,38 @@ describe('Test event endpoints', () => {
     expect(res2.status).toBe(204);
   });
 
-  it('Get event interviewers', async () => {
+  it('Add interviewer / Get event interviewers', async () => {
     const res = await request.post('/events').send(eventData);
 
+    // make sure event creator is included in interviewers[]
     const fetchedInterviewers = await request.get(`/events/${res.body._id}/interviewers`);
     expect(fetchedInterviewers.body[0].userId).toBe(eventData.eventCreator);
+
+    // create another temp user to add to event
+    const newInterviewer = await new User({
+      name: 'new interviewer',
+      email: 'new.interviewer@gmail.com',
+    }).save();
+    const a1 = await request.post(`/events/${res.body._id}/interviewers`).send({ userId: newInterviewer._id });
+    expect(a1.text).toBe('1 user(s) added successfully');
+    // add same interviewer again
+    const a2 = await request.post(`/events/${res.body._id}/interviewers`).send({ userId: newInterviewer._id });
+    expect(a2.text).toBe('0 user(s) added successfully');
+
+    // make sure interviewers are in event
+    const updatedInterviewers = await request.get(`/events/${res.body._id}/interviewers`);
+    expect(updatedInterviewers.body
+      .some((interviewer) => interviewer.userId === eventData.eventCreator)).toBe(true);
+    expect(updatedInterviewers.body
+      .some((interviewer) => interviewer.userId === newInterviewer._id.toString())).toBe(true);
+
+    // make sure event is in new interviewer
+    const updatedNewInterviewer = await request.get(`/users/${newInterviewer._id}`);
+    expect(updatedNewInterviewer.body.events
+      .some((e) => e === res.body._id)).toBe(true);
+
+    // delete temp user
+    await request.delete(`/users/${newInterviewer._id}`);
 
     const res1 = await request.delete(`/events/${res.body._id}`);
     expect(res1.status).toBe(204);

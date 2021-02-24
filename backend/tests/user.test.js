@@ -11,7 +11,6 @@ const userData = new User({
   picture: 'pictureString',
   googleId: 'googleIdString',
   secret: 'secretString',
-  // events: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
 });
 
 describe('Test user endpoints', () => {

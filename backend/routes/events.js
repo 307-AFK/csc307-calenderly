@@ -8,5 +8,6 @@ router.post('/', events.createEvent);
 router.get('/:eventid', events.getEvent);
 router.delete('/:eventid', events.deleteEvent);
 router.get('/:eventid/interviewers', events.getEventInterviewers);
+router.post('/:eventid/interviewers', events.addInterviewer);
 
 module.exports = router;
