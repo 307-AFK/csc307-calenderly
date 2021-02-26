@@ -1,8 +1,8 @@
-name: Deploy to AWS
+name: Frontend Deployment
 
 on:
   push:
-    branches: [ dev ]
+    branches: [ dev, ci ]
 
 jobs:
   frontend_deployment:
@@ -22,6 +22,8 @@ jobs:
     - name: Build site
       working-directory: ./frontend
       run: yarn build
+      env:
+        REACT_APP_SERVER_URL: ${{ secrets.PROD_SERVER_URL }}
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
