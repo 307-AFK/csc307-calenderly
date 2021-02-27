@@ -65,7 +65,7 @@ describe('Test user endpoints', () => {
     const theEvent = (await request.post('/events').send(eventData)).body;
 
     // make a new user and add to the event
-    let newInterviewer = await new User({
+    const newInterviewer = await new User({
       name: 'new interviewer',
       email: 'new.interviewer@gmail.com',
     }).save();
@@ -74,11 +74,11 @@ describe('Test user endpoints', () => {
 
     // make sure the event is in testUser's and newInterviewer's events[]
     // get latest
-    testUser = (await request.get(`/users/${testUser._id}`)).body;
-    newInterviewer = (await request.get(`/users/${newInterviewer._id}`)).body;
+    const testUserEvents = (await request.get(`/users/${testUser._id}/events`)).body;
+    const newInterviewerEvents = (await request.get(`/users/${newInterviewer._id}/events`)).body;
     // check
-    expect(testUser.events.some((eventId) => eventId === theEvent._id.toString())).toBe(true);
-    expect(newInterviewer.events.some((eventId) => eventId === theEvent._id.toString())).toBe(true);
+    expect(testUserEvents.some((eventId) => eventId === theEvent._id.toString())).toBe(true);
+    expect(newInterviewerEvents.some((eventId) => eventId === theEvent._id.toString())).toBe(true);
 
     // delete newInterviewer
     const res = await request.delete(`/users/${newInterviewer._id}`);
