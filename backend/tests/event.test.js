@@ -38,82 +38,86 @@ describe('Test event endpoints', () => {
   });
 
   it('Create and delete event', async () => {
-    const res = await request.post('/events').send(eventData);
-    expect(res.body._id).toBeDefined();
-    expect(res.body.title).toBe(eventData.title);
-    expect(res.body.description).toBe(eventData.description);
-    expect(res.body.startDate).toBe(eventData.startDate);
-    expect(res.body.endDate).toBe(eventData.endDate);
-    expect(res.body.interviewersNeeded).toBe(eventData.interviewersNeeded);
-    expect(res.body.availabilityIncrement).toBe(eventData.availabilityIncrement);
-    expect(res.body.interviewers[0].userId).toBe(eventData.eventCreator);
+    // create and check returned event
+    const theEvent = (await request.post('/events').send(eventData)).body;
+    expect(theEvent._id).toBeDefined();
+    expect(theEvent.title).toBe(eventData.title);
+    expect(theEvent.description).toBe(eventData.description);
+    expect(theEvent.startDate).toBe(eventData.startDate);
+    expect(theEvent.endDate).toBe(eventData.endDate);
+    expect(theEvent.interviewersNeeded).toBe(eventData.interviewersNeeded);
+    expect(theEvent.availabilityIncrement).toBe(eventData.availabilityIncrement);
+    expect(theEvent.interviewers[0].userId).toBe(eventData.eventCreator);
 
     // check that our created event exists in the creator's list of events
-    const theCreator = await request.get(`/users/${testUser._id}`);
-    expect(theCreator.body.events.some((eventid) => eventid === res.body._id)).toBe(true);
+    const theCreator = (await request.get(`/users/${testUser._id}`)).body;
+    expect(theCreator.events.some((eventid) => eventid === theEvent._id)).toBe(true);
 
-    const res1 = await request.delete(`/events/${res.body._id}`);
+    const res1 = await request.delete(`/events/${theEvent._id}`);
     expect(res1.status).toBe(204);
   });
 
   it('Get event by id', async () => {
-    const res = await request.post('/events').send(eventData);
+    // create event
+    const theEvent = (await request.post('/events').send(eventData)).body;
 
-    const fetchedEvent = await request.get(`/events/${res.body._id}`);
-    expect(JSON.stringify(fetchedEvent.body)).toBe(JSON.stringify(res.body));
+    // get event and check
+    const fetchedEvent = (await request.get(`/events/${theEvent._id}`)).body;
+    expect(JSON.stringify(fetchedEvent)).toBe(JSON.stringify(theEvent));
 
-    const res1 = await request.delete(`/events/${res.body._id}`);
+    const res1 = await request.delete(`/events/${theEvent._id}`);
     expect(res1.status).toBe(204);
   });
 
   it('Get all events', async () => {
-    const savedEvent1 = await request.post('/events').send(eventData);
-    const savedEvent2 = await request.post('/events').send(eventData);
+    const savedEvent1 = (await request.post('/events').send(eventData)).body;
+    const savedEvent2 = (await request.post('/events').send(eventData)).body;
 
-    const fetchedEvents = await request.get('/events');
-    expect(fetchedEvents.body.some((event) => event._id === savedEvent1.body._id)).toBe(true);
-    expect(fetchedEvents.body.some((event) => event._id === savedEvent2.body._id)).toBe(true);
+    const fetchedEvents = (await request.get('/events')).body;
+    expect(fetchedEvents.some((event) => event._id === savedEvent1._id)).toBe(true);
+    expect(fetchedEvents.some((event) => event._id === savedEvent2._id)).toBe(true);
 
-    const res1 = await request.delete(`/events/${savedEvent1.body._id}`);
-    const res2 = await request.delete(`/events/${savedEvent2.body._id}`);
+    const res1 = await request.delete(`/events/${savedEvent1._id}`);
+    const res2 = await request.delete(`/events/${savedEvent2._id}`);
     expect(res1.status).toBe(204);
     expect(res2.status).toBe(204);
   });
 
   it('Add interviewer / Get event interviewers', async () => {
-    const res = await request.post('/events').send(eventData);
+    const theEvent = (await request.post('/events').send(eventData)).body;
 
     // make sure event creator is included in interviewers[]
-    const fetchedInterviewers = await request.get(`/events/${res.body._id}/interviewers`);
-    expect(fetchedInterviewers.body[0].userId).toBe(eventData.eventCreator);
+    const fetchedInterviewers = (await request.get(`/events/${theEvent._id}/interviewers`)).body;
+    expect(fetchedInterviewers[0].userId).toBe(eventData.eventCreator);
 
     // create another temp user to add to event
     const newInterviewer = await new User({
       name: 'new interviewer',
       email: 'new.interviewer@gmail.com',
     }).save();
-    const a1 = await request.post(`/events/${res.body._id}/interviewers`).send({ userId: newInterviewer._id });
+    const a1 = await request.post(`/events/${theEvent._id}/interviewers`).send({ userId: newInterviewer._id });
     expect(a1.text).toBe('1 user(s) added successfully');
     // add same interviewer again
-    const a2 = await request.post(`/events/${res.body._id}/interviewers`).send({ userId: newInterviewer._id });
+    const a2 = await request.post(`/events/${theEvent._id}/interviewers`).send({ userId: newInterviewer._id });
     expect(a2.text).toBe('0 user(s) added successfully');
 
     // make sure interviewers are in event
-    const updatedInterviewers = await request.get(`/events/${res.body._id}/interviewers`);
-    expect(updatedInterviewers.body
+    const updatedInterviewers = (await request.get(`/events/${theEvent._id}/interviewers`)).body;
+    expect(updatedInterviewers
       .some((interviewer) => interviewer.userId === eventData.eventCreator)).toBe(true);
-    expect(updatedInterviewers.body
+    expect(updatedInterviewers
       .some((interviewer) => interviewer.userId === newInterviewer._id.toString())).toBe(true);
 
     // make sure event is in new interviewer
-    const updatedNewInterviewer = await request.get(`/users/${newInterviewer._id}`);
-    expect(updatedNewInterviewer.body.events
-      .some((e) => e === res.body._id)).toBe(true);
+    const updatedNewInterviewer = (await request.get(`/users/${newInterviewer._id}`)).body;
+    expect(updatedNewInterviewer.events
+      .some((e) => e === theEvent._id)).toBe(true);
 
     // delete temp user
-    await request.delete(`/users/${newInterviewer._id}`);
+    const res = await request.delete(`/users/${newInterviewer._id}`);
+    expect(res.status).toBe(204);
 
-    const res1 = await request.delete(`/events/${res.body._id}`);
-    expect(res1.status).toBe(204);
+    const res2 = await request.delete(`/events/${theEvent._id}`);
+    expect(res2.status).toBe(204);
   });
 });

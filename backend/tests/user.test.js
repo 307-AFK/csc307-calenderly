@@ -42,8 +42,7 @@ describe('Test user endpoints', () => {
 
   it('Get user, get users, delete user', async () => {
     // Test get user
-    const res1 = await request.get(`/users/${testUser._id}`);
-    const user1 = res1.body;
+    const user1 = (await request.get(`/users/${testUser._id}`)).body;
     expect(JSON.stringify(user1)).toBe(JSON.stringify(testUser));
 
     // make a second temporary user so getUsers is meaningful and
@@ -52,28 +51,26 @@ describe('Test user endpoints', () => {
       email: 'test.user2@gmail.com',
       name: 'Test User 2',
     }).save();
-    const res2 = await request.get('/users');
-    const users = res2.body;
+    const users = (await request.get('/users')).body;
     expect(users.some((user) => user._id.toString() === testUser._id.toString())).toBe(true);
     expect(users.some((user) => user._id.toString() === testUser2._id.toString())).toBe(true);
 
     // make sure testUser2 is deleted successfully
-    const res3 = await request.delete(`/users/${testUser2._id}`);
-    expect(res3.status).toBe(204);
+    const res = await request.delete(`/users/${testUser2._id}`);
+    expect(res.status).toBe(204);
   });
 
   it('Get user events', async () => {
     // create event (testUser is creator)
-    const res1 = await request.post('/events').send(eventData);
-    const theEvent = res1.body;
+    const theEvent = (await request.post('/events').send(eventData)).body;
 
     // make a new user and add to the event
     let newInterviewer = await new User({
       name: 'new interviewer',
       email: 'new.interviewer@gmail.com',
     }).save();
-    const res2 = await request.post(`/events/${theEvent._id}/interviewers`).send({ userId: newInterviewer._id });
-    expect(res2.text).toBe('1 user(s) added successfully');
+    const postMessage = (await request.post(`/events/${theEvent._id}/interviewers`).send({ userId: newInterviewer._id })).text;
+    expect(postMessage).toBe('1 user(s) added successfully');
 
     // make sure the event is in testUser's and newInterviewer's events[]
     // get latest
@@ -84,11 +81,11 @@ describe('Test user endpoints', () => {
     expect(newInterviewer.events.some((eventId) => eventId === theEvent._id.toString())).toBe(true);
 
     // delete newInterviewer
-    const res3 = await request.delete(`/users/${newInterviewer._id}`);
-    expect(res3.status).toBe(204);
+    const res = await request.delete(`/users/${newInterviewer._id}`);
+    expect(res.status).toBe(204);
 
     // delete theEvent
-    const res4 = await request.delete(`/events/${theEvent._id}`);
-    expect(res4.status).toBe(204);
+    const res2 = await request.delete(`/events/${theEvent._id}`);
+    expect(res2.status).toBe(204);
   });
 });
