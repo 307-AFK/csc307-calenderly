@@ -10,6 +10,7 @@ import Card from './components/Card';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
 import Events from './pages/Events';
+import Event from './pages/Event';
 import CreateEvent from './pages/CreateEvent';
 
 import './App.less';
@@ -43,6 +44,9 @@ const App = () => {
                 </Route>
                 <Route path='/create'>
                   <CreateEvent user={profile} />
+                </Route>
+                <Route path='/event/:id'>
+                  <Event user={profile} />
                 </Route>
               </Switch>
             </Content>
