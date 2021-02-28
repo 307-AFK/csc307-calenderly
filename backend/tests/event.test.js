@@ -120,4 +120,36 @@ describe('Test event endpoints', () => {
     const res2 = await request.delete(`/events/${theEvent._id}`);
     expect(res2.status).toBe(204);
   });
+
+  it('Add interviewee / Get event interviewees', async () => {
+    const theEvent = (await request.post('/events').send(eventData)).body;
+
+    // create another temp user to add to event
+    const newInterviewee = await new User({
+      name: 'new interviewee',
+      email: 'new.interviewee@gmail.com',
+    }).save();
+    const a1 = await request.post(`/events/${theEvent._id}/interviewees`).send({ userId: newInterviewee._id });
+    expect(a1.text).toBe('1 user(s) added successfully');
+    // add same interviewee again
+    const a2 = await request.post(`/events/${theEvent._id}/interviewees`).send({ userId: newInterviewee._id });
+    expect(a2.text).toBe('0 user(s) added successfully');
+
+    // make sure new interviewee is in event
+    const updatedInterviewees = (await request.get(`/events/${theEvent._id}/interviewees`)).body;
+    expect(updatedInterviewees
+      .some((interviewee) => interviewee.userId === newInterviewee._id.toString())).toBe(true);
+
+    // make sure event is in new interviewee
+    const updatedNewInterviewee = (await request.get(`/users/${newInterviewee._id}`)).body;
+    expect(updatedNewInterviewee.events
+      .some((e) => e === theEvent._id)).toBe(true);
+
+    // delete temp user
+    const res = await request.delete(`/users/${newInterviewee._id}`);
+    expect(res.status).toBe(204);
+
+    const res2 = await request.delete(`/events/${theEvent._id}`);
+    expect(res2.status).toBe(204);
+  });
 });
