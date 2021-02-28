@@ -46,3 +46,29 @@ module.exports.getEvents = async (req, res) => {
     res.status(400).send('Invalid user id');
   }
 };
+
+module.exports.getEventsAsInterviewer = async (req, res) => {
+  if (mongoose.Types.ObjectId.isValid(req.params.userid)) {
+    const user = await User.findById(req.params.userid);
+    if (user) {
+      res.send(user.events.filter((e) => e.role === 'interviewer'));
+    } else {
+      res.status(404).send('User not found');
+    }
+  } else {
+    res.status(400).send('Invalid user id');
+  }
+};
+
+module.exports.getEventsAsInterviewee = async (req, res) => {
+  if (mongoose.Types.ObjectId.isValid(req.params.userid)) {
+    const user = await User.findById(req.params.userid);
+    if (user) {
+      res.send(user.events.filter((e) => e.role === 'interviewee'));
+    } else {
+      res.status(404).send('User not found');
+    }
+  } else {
+    res.status(400).send('Invalid user id');
+  }
+};

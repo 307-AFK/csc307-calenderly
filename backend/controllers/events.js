@@ -43,7 +43,7 @@ module.exports.createEvent = async (req, res) => {
       // add this event to the creator's list of events
       User.findOneAndUpdate(
         { _id: mongoose.Types.ObjectId(req.body.eventCreator) },
-        { $push: { events: newEvent._id } },
+        { $push: { events: { eventId: newEvent._id, role: 'interviewer' } } },
       ).then((user) => {
         if (user) {
           res.status(201).send(event);
@@ -63,8 +63,8 @@ module.exports.deleteEvent = async (req, res) => {
     if (deletedEvent) {
       // delete all references to the event in User collection
       User.updateMany(
-        { events: req.params.eventid },
-        { $pull: { events: req.params.eventid } },
+        { events: { eventId: req.params.eventid } },
+        { $pull: { events: { eventId: req.params.eventid } } },
       ).then(() => {
         res.status(204).send('Event deleted');
       });
@@ -123,7 +123,7 @@ module.exports.addInterviewer = async (req, res) => {
       // add event to list in user (if not already added)
       User.updateOne(
         { _id: req.body.userId },
-        { $addToSet: { events: req.params.eventid } },
+        { $addToSet: { events: { eventId: req.params.eventid, role: 'interviewer' } } },
       ).then((updatedUser) => {
         if (!updatedUser) {
           res.status(404).send('Couldn\'t update user');
@@ -155,7 +155,7 @@ module.exports.addInterviewee = async (req, res) => {
       // add event to list in user (if not already added)
       User.updateOne(
         { _id: req.body.userId },
-        { $addToSet: { events: req.params.eventid } },
+        { $addToSet: { events: { eventId: req.params.eventid, role: 'interviewee' } } },
       ).then((updatedUser) => {
         if (!updatedUser) {
           res.status(404).send('Couldn\'t update user');

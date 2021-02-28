@@ -51,7 +51,7 @@ describe('Test event endpoints', () => {
 
     // check that our created event exists in the creator's list of events
     const theCreator = (await request.get(`/users/${testUser._id}`)).body;
-    expect(theCreator.events.some((eventid) => eventid === theEvent._id)).toBe(true);
+    expect(theCreator.events.some((e) => e.eventId === theEvent._id)).toBe(true);
 
     const res1 = await request.delete(`/events/${theEvent._id}`);
     expect(res1.status).toBe(204);
@@ -111,7 +111,7 @@ describe('Test event endpoints', () => {
     // make sure event is in new interviewer
     const updatedNewInterviewer = (await request.get(`/users/${newInterviewer._id}`)).body;
     expect(updatedNewInterviewer.events
-      .some((e) => e === theEvent._id)).toBe(true);
+      .some((e) => e.eventId === theEvent._id)).toBe(true);
 
     // delete temp user
     const res = await request.delete(`/users/${newInterviewer._id}`);
@@ -143,7 +143,7 @@ describe('Test event endpoints', () => {
     // make sure event is in new interviewee
     const updatedNewInterviewee = (await request.get(`/users/${newInterviewee._id}`)).body;
     expect(updatedNewInterviewee.events
-      .some((e) => e === theEvent._id)).toBe(true);
+      .some((e) => e.eventId === theEvent._id)).toBe(true);
 
     // delete temp user
     const res = await request.delete(`/users/${newInterviewee._id}`);
