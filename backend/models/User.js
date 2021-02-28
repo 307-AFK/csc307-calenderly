@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
   picture: String,
   googleId: String,
   secret: String,
-  events: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
+  events: [{ eventId: { type: Schema.Types.ObjectId, ref: 'Event' }, role: String }],
 });
 
 userSchema.plugin(passportLocalMongoose);
