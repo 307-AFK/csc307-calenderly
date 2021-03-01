@@ -30,7 +30,7 @@ const App = () => {
   return (
     <BrowserRouter>
       { profile ? (
-        <Card width={16}>
+        <Card width={16} page>
           <Layout>
             <Sidebar />
             <Content>
