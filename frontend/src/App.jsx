@@ -36,7 +36,7 @@ const App = () => {
             <Content>
               <Switch>
                 <Route exact path='/'>
-                  <Events />
+                  <Events user={profile} />
                 </Route>
                 <Route path='/profile'>
                   <Profile user={profile} />
