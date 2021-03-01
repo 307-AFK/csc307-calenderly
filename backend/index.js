@@ -8,5 +8,5 @@ mongoose.connect(process.env.DATABASE_URL, {
   useCreateIndex: true,
 }).then(() => console.log('Connected to MongoDB'));
 
-const port = process.env.PORT || 3001;
+const port =  process.env.PORT || 3001;
 app.listen(port, () => console.log(`Server running on port ${port}`));
