@@ -8,6 +8,7 @@ import {
   PlusOutlined,
 } from '@ant-design/icons';
 
+// TODO: this could be moved into this file. probably won't be reused?
 import ScheduledEvents from '../components/ScheduledEvents';
 
 const Events = ({ user }) => (

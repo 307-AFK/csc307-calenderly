@@ -1,36 +1,33 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'antd';
+import { Row, Space } from 'antd';
+
 import Card from './Card';
+import ButtonLink from './ButtonLink';
 
 const EventCard = (props) => {
   const { event, isInterviewer } = props;
-  if (isInterviewer) {
-    return (
-      <Card width={8}>
-        <>
-          event:
-          {event.eventId}
-          <br />
-          <Button>
-            Update Event
-          </Button>
-          <Button>
-            Set Availability
-          </Button>
-        </>
-      </Card>
-    );
-  }
+  const linkBase = `event/${event.eventId}`;
+
   return (
-    <Card width={8}>
-      <>
-        event:
-        {event.eventId}
-        <Button>
-          Set Availability
-        </Button>
-      </>
+    <Card width={24}>
+      <Row justify='space-between' align='middle'>
+        <Space>
+          <p>
+            event:
+            {event.eventId}
+          </p>
+        </Space>
+
+        <Space>
+          { isInterviewer && (
+            <ButtonLink link={`${linkBase}/update`}>Update Event</ButtonLink>
+          )}
+          <ButtonLink link={`${linkBase}/availability`}>
+            Set Availability
+          </ButtonLink>
+        </Space>
+      </Row>
     </Card>
   );
 };

@@ -1,57 +1,36 @@
 import { React, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { Divider } from 'antd';
 import EventCard from './EventCard';
 
 const ScheduledEvents = ({ user }) => {
   const [interviewerEvents, updateInterviewerEvents] = useState([]);
   const [intervieweeEvents, updateIntervieweeEvents] = useState([]);
 
+  const eventEndpoint = `${process.env.REACT_APP_SERVER_URL}/users/${user.id}/events`;
+
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_SERVER_URL}/users/${user.id}/events/interviewer`,
-      { credentials: 'include' }).then((res) => res.json())
-      .then((events) => {
-        updateInterviewerEvents(events);
-      });
-    fetch(`${process.env.REACT_APP_SERVER_URL}/users/${user.id}/events/interviewee`,
-      { credentials: 'include' }).then((res) => res.json())
-      .then((events) => {
-        updateIntervieweeEvents(events);
-      });
+    fetch(`${eventEndpoint}/interviewer`, { credentials: 'include' })
+      .then((res) => res.json())
+      .then((events) => updateInterviewerEvents(events));
+
+    fetch(`${eventEndpoint}/interviewee`, { credentials: 'include' })
+      .then((res) => res.json())
+      .then((events) => updateIntervieweeEvents(events));
   }, []);
 
   return (
     <>
-      <div>
-        ur an interviewer for these. . .
-      </div>
-      <InterviewerEvents events={interviewerEvents} />
-      <br />
-      <br />
-      <div>
-        ur an interviewee for these. . .
-      </div>
-      <IntervieweeEvents events={intervieweeEvents} />
-    </>
-  );
-};
-
-const InterviewerEvents = (props) => {
-  const { events } = props;
-  return (
-    <>
+      <h2>Interviewer</h2>
       {
-        events.map((e) => <EventCard key={e.eventId} event={e} isInterviewer />)
+        interviewerEvents.map((e) => (
+          <EventCard key={e.eventId} event={e} isInterviewer />))
       }
-    </>
-  );
-};
-
-const IntervieweeEvents = (props) => {
-  const { events } = props;
-  return (
-    <>
+      <Divider />
+      <h2>Interviewee</h2>
       {
-        events.map((e) => <EventCard key={e.eventId} event={e} />)
+        intervieweeEvents.map((e) => (
+          <EventCard key={e.eventId} event={e} />))
       }
     </>
   );
@@ -61,14 +40,6 @@ ScheduledEvents.propTypes = {
   user: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }).isRequired,
-};
-
-InterviewerEvents.propTypes = {
-  events: PropTypes.arrayOf(PropTypes.shape({ eventId: PropTypes.string.isRequired })).isRequired,
-};
-
-IntervieweeEvents.propTypes = {
-  events: PropTypes.arrayOf(PropTypes.shape({ eventId: PropTypes.string.isRequired })).isRequired,
 };
 
 export default ScheduledEvents;
