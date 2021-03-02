@@ -5,12 +5,12 @@ import { Row, Col, Button } from 'antd';
 import styles from '../styles/Calendar.module.css';
 
 const TimeSlotBtn = (props) => {
-  const { val, tog } = props;
+  const { index, val, tog } = props;
   const [available, toggle] = useState(val);
 
   const toggleAvailability = () => {
+    tog(index, !available);
     toggle(!available);
-    tog(true);
   };
 
   return (
@@ -29,7 +29,7 @@ const TimeSlotBtn = (props) => {
 const Calendar = (props) => {
   const { times, toggled } = props;
 
-  // this can be found in the actual availability
+  // this should be found in the actual availability
   const hours = [
     { time: '9:00 am' },
     { time: '10:00 am' },
@@ -43,13 +43,13 @@ const Calendar = (props) => {
 
   const timeCols = [{ title: 'Times', key: 'times', vals: hours }];
 
-  const dayCols = times ? times.map((t) => (
+  const dayCols = times.map((t) => (
     // eslint-disable-next-line no-underscore-dangle
     { title: t.date.split('T')[0], key: t._id, vals: t.times }
-  )) : null;
+  ));
 
   const columns = timeCols.concat(dayCols);
-  const rows = hours.map((h, i) => columns.map((c) => (c ? c.vals[i] : false)));
+  const rows = hours.map((h, i) => columns.map((c) => c.vals[i]));
 
   return (
     <>
@@ -68,15 +68,25 @@ const Calendar = (props) => {
             if (j === 0) {
               return <Col key={(i, j)} span={4} align='right'>{c.time}</Col>;
             }
-            return <TimeSlotBtn key={(i, j)} val={c} tog={toggled} />;
+
+            return (
+              <TimeSlotBtn
+                key={(i, j)}
+                index={[j - 1, i]} // the index on the supplied times arr
+                val={c}
+                tog={toggled}
+              />
+            );
           })}
         </Row>
       ))}
+
     </>
   );
 };
 
 TimeSlotBtn.propTypes = {
+  index: PropTypes.arrayOf(PropTypes.int).isRequired,
   val: PropTypes.bool.isRequired,
   tog: PropTypes.func.isRequired,
 };

@@ -10,10 +10,20 @@ import {
 import Calendar from '../../components/Calendar';
 
 const Availability = (props) => {
-  // TODO: true saving logic may have to be moved into the calendar
+  const { avail } = props;
   const [unsaved, setUnsaved] = useState(false);
 
-  const { avail } = props;
+  const updateAvailability = (index, status) => {
+    const [day, time] = index;
+    avail[day].times[time] = status;
+    setUnsaved(true);
+  };
+
+  const saveAvailability = () => {
+    if (!unsaved) return;
+    setUnsaved(false);
+    console.log(avail);
+  };
 
   return (
     <>
@@ -23,10 +33,10 @@ const Availability = (props) => {
       />
       <Row>
         <Col offset={2} span={20}>
-          <Calendar times={avail} toggled={setUnsaved} />
+          <Calendar times={avail} toggled={updateAvailability} />
           <Button
             type={unsaved ? 'primary' : 'default'}
-            onClick={() => setUnsaved(false)}
+            onClick={saveAvailability}
           >
             Save
           </Button>
