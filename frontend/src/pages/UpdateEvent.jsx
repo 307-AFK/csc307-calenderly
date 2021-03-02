@@ -6,6 +6,8 @@ import {
 } from 'antd';
 
 const { RangePicker } = DatePicker;
+import Interviewers from '../components/Interviewers';
+import Interviewees from '../components/Interviewees';
 
 const UpdateEvent = ({ user }) => {
   const { eventId } = useParams();
@@ -20,7 +22,8 @@ const UpdateEvent = ({ user }) => {
       });
   }, []);
 
-  if (!eventInfo.interviewers || !eventInfo.interviewers.some((u) => u.userId === user.id)) {
+  if (!eventInfo || !eventInfo.interviewers
+    || !eventInfo.interviewers.some((u) => u.userId === user.id)) {
     return <div>You do not have permission to edit this event</div>;
   }
   return (
@@ -126,6 +129,14 @@ const Interviewer = ({ userId }) => {
       (
       {userInfo.email}
       )
+      eventId:
+      {eventId}
+      <br />
+      event:
+      {eventInfo.title}
+      <br />
+      <Interviewers users={eventInfo.interviewers} updateEventInfo={updateEventInfo} />
+      <Interviewees users={eventInfo.interviewees} updateEventInfo={updateEventInfo} />
     </div>
   );
 };
@@ -145,16 +156,6 @@ UpdateEvent.propTypes = {
   user: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }).isRequired,
-};
-
-Interviewers.propTypes = {
-  users: PropTypes.arrayOf(
-    PropTypes.shape({ userId: PropTypes.string }),
-  ).isRequired,
-};
-
-Interviewer.propTypes = {
-  userId: PropTypes.string.isRequired,
 };
 
 export default UpdateEvent;

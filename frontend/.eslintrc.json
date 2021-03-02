@@ -18,6 +18,7 @@
     "plugins": [
         "react"
     ],
+    "ignorePatterns": ["build/**"],
     "rules": {
         "jsx-quotes": ["error", "prefer-single"]
     }
