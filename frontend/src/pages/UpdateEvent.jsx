@@ -47,6 +47,7 @@ const EventDetails = (props) => {
           description: values.description,
           startDate: values.daterange[0],
           endDate: values.daterange[1],
+          interviewersNeeded: values.interviewersNeeded,
         }),
       });
   };
@@ -56,13 +57,14 @@ const EventDetails = (props) => {
       <h3>{eventInfo.startDate}</h3>
       <h3>{eventInfo.endDate}</h3>
       <h3>{eventInfo.description}</h3>
+      <h3>{eventInfo.interviewersNeeded}</h3>
       <h3>{eventId}</h3>
       <Form onFinish={onFinish}>
         <Form.Item
           label='Event Title'
           name='title'
         >
-          <Input type='text' defaultValue={eventInfo.title} />
+          <Input type='text' />
         </Form.Item>
         <Form.Item
           label='Start And End Dates'
@@ -77,7 +79,13 @@ const EventDetails = (props) => {
           label='Description'
           name='description'
         >
-          <Input type='text' defaultValue={eventInfo.description} />
+          <Input type='text' />
+        </Form.Item>
+        <Form.Item
+          label='Interviewers Needed'
+          name='interviewersNeeded'
+        >
+          <Input type='number' />
         </Form.Item>
         <Form.Item>
           <Button type='primary' htmlType='submit'>
@@ -128,6 +136,7 @@ EventDetails.propTypes = {
     startDate: PropTypes.string.isRequired,
     endDate: PropTypes.string.isRequired,
     description: PropTypes.string,
+    interviewersNeeded: PropTypes.number.isRequired,
   }).isRequired,
   eventId: PropTypes.string.isRequired,
 };

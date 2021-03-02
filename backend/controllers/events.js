@@ -83,6 +83,7 @@ module.exports.updateEvent = async (req, res) => {
       e.description = req.body.description;
       e.startDate = req.body.startDate;
       e.endDate = req.body.endDate;
+      e.interviewersNeeded = req.body.interviewersNeeded;
       e.save().then(() => {
         res.status(204).send('Event updated');
       });
