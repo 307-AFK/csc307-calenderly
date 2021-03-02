@@ -86,7 +86,7 @@ const Calendar = (props) => {
 };
 
 TimeSlotBtn.propTypes = {
-  index: PropTypes.arrayOf(PropTypes.int).isRequired,
+  index: PropTypes.arrayOf(PropTypes.number).isRequired,
   val: PropTypes.bool.isRequired,
   tog: PropTypes.func.isRequired,
 };
