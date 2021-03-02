@@ -109,65 +109,63 @@ module.exports.getEventInterviewees = async (req, res) => {
 };
 
 module.exports.addInterviewer = async (req, res) => {
-  const validEventId = mongoose.Types.ObjectId.isValid(req.params.eventid);
-  const validUserId = mongoose.Types.ObjectId.isValid(req.body.userId);
-  if (validEventId && validUserId) {
-    // add interviewer to list in event (if not already added)
-    Event.updateOne(
-      { _id: req.params.eventid, 'interviewers.userId': { $ne: req.body.userId } },
-      { $push: { interviewers: { userId: req.body.userId } } },
-    ).then((updatedEvent) => {
-      if (!updatedEvent) {
-        res.status(404).send('Couldn\'t update event');
-      }
-      // add event to list in user (if not already added)
-      User.updateOne(
-        { _id: req.body.userId },
-        { $addToSet: { events: { eventId: req.params.eventid, role: 'interviewer' } } },
-      ).then((updatedUser) => {
-        if (!updatedUser) {
-          res.status(404).send('Couldn\'t update user');
-        }
-        res.status(200).send(`${updatedEvent.n} user(s) added successfully`);
-      });
-    });
-  } else if (validUserId) {
-    res.status(400).send('Invalid event id');
-  } else if (validEventId) {
-    res.status(400).send('Invalid user id');
-  } else {
-    res.status(400).send('Invalid event and user ids');
+  // get user by email
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    res.status(404).send('No user exists with this email address');
+    return;
   }
+  if (!mongoose.Types.ObjectId.isValid(req.params.eventid)) {
+    res.status(400).send('Invalid event id');
+  }
+
+  Event.updateOne(
+    { _id: req.params.eventid, 'interviewers.userId': { $ne: user._id } },
+    { $push: { interviewers: { userId: user._id } } },
+  ).then((updatedEvent) => {
+    if (!updatedEvent) {
+      res.status(404).send('Couldn\'t update event');
+    }
+    // add event to list in user (if not already added)
+    User.updateOne(
+      { _id: user._id },
+      { $addToSet: { events: { eventId: req.params.eventid, role: 'interviewer' } } },
+    ).then((updatedUser) => {
+      if (!updatedUser) {
+        res.status(404).send('Couldn\'t update user');
+      }
+      res.status(200).send(`${updatedEvent.n} user(s) added successfully`);
+    });
+  });
 };
 
 module.exports.addInterviewee = async (req, res) => {
-  const validEventId = mongoose.Types.ObjectId.isValid(req.params.eventid);
-  const validUserId = mongoose.Types.ObjectId.isValid(req.body.userId);
-  if (validEventId && validUserId) {
-    // add interviewee to list in event (if not already added)
-    Event.updateOne(
-      { _id: req.params.eventid, 'interviewees.userId': { $ne: req.body.userId } },
-      { $push: { interviewees: { userId: req.body.userId } } },
-    ).then((updatedEvent) => {
-      if (!updatedEvent) {
-        res.status(404).send('Couldn\'t update event');
-      }
-      // add event to list in user (if not already added)
-      User.updateOne(
-        { _id: req.body.userId },
-        { $addToSet: { events: { eventId: req.params.eventid, role: 'interviewee' } } },
-      ).then((updatedUser) => {
-        if (!updatedUser) {
-          res.status(404).send('Couldn\'t update user');
-        }
-        res.status(200).send(`${updatedEvent.n} user(s) added successfully`);
-      });
-    });
-  } else if (validUserId) {
-    res.status(400).send('Invalid event id');
-  } else if (validEventId) {
-    res.status(400).send('Invalid user id');
-  } else {
-    res.status(400).send('Invalid event and user ids');
+  // get user by email
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    res.status(404).send('No user exists with this email address');
+    return;
   }
+  if (!mongoose.Types.ObjectId.isValid(req.params.eventid)) {
+    res.status(400).send('Invalid event id');
+  }
+
+  Event.updateOne(
+    { _id: req.params.eventid, 'interviewees.userId': { $ne: user._id } },
+    { $push: { interviewees: { userId: user._id } } },
+  ).then((updatedEvent) => {
+    if (!updatedEvent) {
+      res.status(404).send('Couldn\'t update event');
+    }
+    // add event to list in user (if not already added)
+    User.updateOne(
+      { _id: user._id },
+      { $addToSet: { events: { eventId: req.params.eventid, role: 'interviewee' } } },
+    ).then((updatedUser) => {
+      if (!updatedUser) {
+        res.status(404).send('Couldn\'t update user');
+      }
+      res.status(200).send(`${updatedEvent.n} user(s) added successfully`);
+    });
+  });
 };
