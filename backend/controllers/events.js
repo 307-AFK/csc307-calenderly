@@ -138,7 +138,7 @@ module.exports.addInterviewer = async (req, res) => {
   }
 
   Event.updateOne(
-    { _id: req.params.eventid, 'interviewers.userId': { $ne: user._id } },
+    { _id: req.params.eventid, 'interviewers.userId': { $ne: user._id }, 'interviewees.userId': { $ne: user._id } },
     { $push: { interviewers: { userId: user._id } } },
   ).then((updated) => {
     if (!updated) {
@@ -171,7 +171,7 @@ module.exports.addInterviewee = async (req, res) => {
   }
 
   Event.updateOne(
-    { _id: req.params.eventid, 'interviewees.userId': { $ne: user._id } },
+    { _id: req.params.eventid, 'interviewees.userId': { $ne: user._id }, 'interviewers.userId': { $ne: user._id } },
     { $push: { interviewees: { userId: user._id } } },
   ).then((updated) => {
     if (!updated) {
