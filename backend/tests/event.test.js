@@ -96,10 +96,10 @@ describe('Test event endpoints', () => {
       email: 'new.interviewer@gmail.com',
     }).save();
     const a1 = await request.post(`/events/${theEvent._id}/interviewers`).send({ email: newInterviewer.email });
-    expect(a1.text).toBe('1 user(s) added successfully');
+    expect(a1.body.message).toBe('1 user(s) added successfully');
     // add same interviewer again
     const a2 = await request.post(`/events/${theEvent._id}/interviewers`).send({ email: newInterviewer.email });
-    expect(a2.text).toBe('0 user(s) added successfully');
+    expect(a2.body.message).toBe('0 user(s) added successfully');
 
     // make sure interviewers are in event
     const updatedInterviewers = (await request.get(`/events/${theEvent._id}/interviewers`)).body;
@@ -130,10 +130,10 @@ describe('Test event endpoints', () => {
       email: 'new.interviewee@gmail.com',
     }).save();
     const a1 = await request.post(`/events/${theEvent._id}/interviewees`).send({ email: newInterviewee.email });
-    expect(a1.text).toBe('1 user(s) added successfully');
+    expect(a1.body.message).toBe('1 user(s) added successfully');
     // add same interviewee again
     const a2 = await request.post(`/events/${theEvent._id}/interviewees`).send({ email: newInterviewee.email });
-    expect(a2.text).toBe('0 user(s) added successfully');
+    expect(a2.body.message).toBe('0 user(s) added successfully');
 
     // make sure new interviewee is in event
     const updatedInterviewees = (await request.get(`/events/${theEvent._id}/interviewees`)).body;

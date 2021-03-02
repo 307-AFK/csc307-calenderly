@@ -122,19 +122,21 @@ module.exports.addInterviewer = async (req, res) => {
   Event.updateOne(
     { _id: req.params.eventid, 'interviewers.userId': { $ne: user._id } },
     { $push: { interviewers: { userId: user._id } } },
-  ).then((updatedEvent) => {
-    if (!updatedEvent) {
+  ).then((updated) => {
+    if (!updated) {
       res.status(404).send('Couldn\'t update event');
     }
     // add event to list in user (if not already added)
     User.updateOne(
-      { _id: user._id },
-      { $addToSet: { events: { eventId: req.params.eventid, role: 'interviewer' } } },
+      { _id: user._id, 'events.eventId': { $ne: req.params.eventid } },
+      { $push: { events: { eventId: req.params.eventid, role: 'interviewer' } } },
     ).then((updatedUser) => {
       if (!updatedUser) {
         res.status(404).send('Couldn\'t update user');
       }
-      res.status(200).send(`${updatedEvent.n} user(s) added successfully`);
+      Event.findById(req.params.eventid)
+        .then((updatedEvent) => res.status(200)
+          .send({ message: `${updated.n} user(s) added successfully`, event: updatedEvent }));
     });
   });
 };
@@ -153,19 +155,21 @@ module.exports.addInterviewee = async (req, res) => {
   Event.updateOne(
     { _id: req.params.eventid, 'interviewees.userId': { $ne: user._id } },
     { $push: { interviewees: { userId: user._id } } },
-  ).then((updatedEvent) => {
-    if (!updatedEvent) {
+  ).then((updated) => {
+    if (!updated) {
       res.status(404).send('Couldn\'t update event');
     }
     // add event to list in user (if not already added)
     User.updateOne(
-      { _id: user._id },
-      { $addToSet: { events: { eventId: req.params.eventid, role: 'interviewee' } } },
+      { _id: user._id, 'events.eventId': { $ne: req.params.eventid } },
+      { $push: { events: { eventId: req.params.eventid, role: 'interviewee' } } },
     ).then((updatedUser) => {
       if (!updatedUser) {
         res.status(404).send('Couldn\'t update user');
       }
-      res.status(200).send(`${updatedEvent.n} user(s) added successfully`);
+      Event.findById(req.params.eventid)
+        .then((updatedEvent) => res.status(200)
+          .send({ message: `${updated.n} user(s) added successfully`, event: updatedEvent }));
     });
   });
 };
