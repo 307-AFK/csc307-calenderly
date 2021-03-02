@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import {
   Col,
   Row,
@@ -8,17 +9,11 @@ import {
 
 import Calendar from '../../components/Calendar';
 
-const exampleData = [
-  [true, true, true, true, true, true, false, true],
-  [true, true, true, true, true, true, true, true],
-  [true, true, true, true, true, true, true, true],
-  [true, true, false, true, true, true, true, true],
-  [true, true, true, true, true, true, true, true],
-];
-
-const Availability = () => {
+const Availability = (props) => {
   // TODO: true saving logic may have to be moved into the calendar
   const [unsaved, setUnsaved] = useState(false);
+
+  const { avail } = props;
 
   return (
     <>
@@ -28,7 +23,7 @@ const Availability = () => {
       />
       <Row>
         <Col offset={2} span={20}>
-          <Calendar times={exampleData} toggled={setUnsaved} />
+          <Calendar times={avail} toggled={setUnsaved} />
           <Button
             type={unsaved ? 'primary' : 'default'}
             onClick={() => setUnsaved(false)}
@@ -39,6 +34,13 @@ const Availability = () => {
       </Row>
     </>
   );
+};
+
+Availability.propTypes = {
+  avail: PropTypes.arrayOf(PropTypes.shape({
+    date: PropTypes.date,
+    times: PropTypes.arrayOf(PropTypes.bool),
+  })).isRequired,
 };
 
 export default Availability;
