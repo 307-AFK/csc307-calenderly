@@ -8,7 +8,7 @@ router.post('/', events.createEvent);
 router.get('/:eventid', events.getEvent);
 router.delete('/:eventid', events.deleteEvent);
 router.get('/:eventid/interviewers', events.getEventInterviewers);
-router.put('/:eventid', events.updateEvent);
+router.put('/:eventid/update', events.updateEvent);
 router.get('/:eventid/interviewees', events.getEventInterviewees);
 router.post('/:eventid/interviewers', events.addInterviewer);
 router.post('/:eventid/interviewees', events.addInterviewee);

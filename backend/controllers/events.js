@@ -78,13 +78,11 @@ module.exports.updateEvent = async (req, res) => {
   if (mongoose.Types.ObjectId.isValid(req.params.eventid)) {
     const e = await Event.findById(req.params.eventid);
     if (e) {
+      console.log(e);
       e.title = req.body.title;
       e.description = req.body.description;
-      e.interviewers = req.body.interviewers;
       e.startDate = req.body.startDate;
       e.endDate = req.body.endDate;
-      e.interviewersNeeded = req.body.interviewersNeeded;
-      e.availabilityIncrement = req.body.availabilityIncrement;
       e.save().then(() => {
         res.status(204).send('Event updated');
       });
