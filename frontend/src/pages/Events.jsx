@@ -1,32 +1,56 @@
-import React from 'react';
-import { PageHeader, Button } from 'antd';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
+
+import { PageHeader, Button, Divider } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import '../styles/Events.less';
 
-import {
-  PlusOutlined,
-} from '@ant-design/icons';
+import EventCard from '../components/EventCard';
 
-// TODO: this could be moved into this file. probably won't be reused?
-import ScheduledEvents from '../components/ScheduledEvents';
+const Events = ({ user }) => {
+  const [interviewerEvents, updateInterviewerEvents] = useState([]);
+  const [intervieweeEvents, updateIntervieweeEvents] = useState([]);
 
-const Events = ({ user }) => (
-  <>
-    <PageHeader
-      title='Your Events'
-      subTitle={'here\'s what you have scheduled!'}
-    />
-    <div className='content'>
-      <Link to='/create' className='create'>
-        <Button type='primary' icon={<PlusOutlined />}>
-          Create Event
-        </Button>
-      </Link>
-      <ScheduledEvents user={user} />
-    </div>
-  </>
-);
+  const serverURL = process.env.REACT_APP_SERVER_URL;
+  const eventEndpoint = `${serverURL}/users/${user.id}/events`;
+
+  useEffect(() => {
+    fetch(`${eventEndpoint}/interviewer`, { credentials: 'include' })
+      .then((res) => res.json())
+      .then((events) => updateInterviewerEvents(events));
+
+    fetch(`${eventEndpoint}/interviewee`, { credentials: 'include' })
+      .then((res) => res.json())
+      .then((events) => updateIntervieweeEvents(events));
+  }, []);
+
+  return (
+    <>
+      <PageHeader
+        title='Your Events'
+        subTitle={'here\'s what you have scheduled!'}
+      />
+
+      <div className='content'>
+        <Link to='/create' className='create'>
+          <Button type='primary' icon={<PlusOutlined />}>
+            Create Event
+          </Button>
+        </Link>
+
+        <h2>Interviewer</h2>
+        {interviewerEvents.map((e) => (
+          <EventCard key={e.eventId} event={e} isInterviewer />))}
+
+        <Divider />
+        <h2>Interviewee</h2>
+        {intervieweeEvents.map((e) => (
+          <EventCard key={e.eventId} event={e} />))}
+      </div>
+    </>
+  );
+};
 
 Events.propTypes = {
   user: PropTypes.shape({
