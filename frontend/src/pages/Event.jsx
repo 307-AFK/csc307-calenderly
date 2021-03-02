@@ -1,44 +1,25 @@
-import React, { useState } from 'react';
-// import { useParams } from 'react-router-dom';
+import React from 'react';
 import {
-  Col,
-  Row,
-  PageHeader,
-  Button,
-} from 'antd';
-import Calendar from '../components/Calendar';
+  Switch,
+  Route,
+  useParams,
+  useRouteMatch,
+} from 'react-router-dom';
 
-const exampleData = [
-  [true, true, true, true, true, true, false, true],
-  [true, true, true, true, true, true, true, true],
-  [true, true, true, true, true, true, true, true],
-  [true, true, false, true, true, true, true, true],
-  [true, true, true, true, true, true, true, true],
-];
+import Availability from './event/Availability';
 
-// const { id } = useParams();
 const Event = () => {
-  // TODO: true saving logic may have to be moved into the calendar
-  const [unsaved, setUnsaved] = useState(false);
+  const match = useRouteMatch();
+  const { id } = useParams();
+
+  console.log(id);
 
   return (
-    <>
-      <PageHeader
-        title='Availability'
-        subTitle='when are you free?'
-      />
-      <Row>
-        <Col offset={2} span={20}>
-          <Calendar times={exampleData} toggled={setUnsaved} />
-          <Button
-            type={unsaved ? 'primary' : 'default'}
-            onClick={() => setUnsaved(false)}
-          >
-            Save
-          </Button>
-        </Col>
-      </Row>
-    </>
+    <Switch>
+      <Route path={`${match.path}/availability`}>
+        <Availability />
+      </Route>
+    </Switch>
   );
 };
 
