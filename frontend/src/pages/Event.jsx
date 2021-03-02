@@ -11,7 +11,7 @@ import Availability from './event/Availability';
 
 const getUserAvail = (userId, avails) => {
   const avail = avails.filter((a) => a.userId === userId);
-  return avail[0].availability;
+  return avail[0];
 };
 
 const Event = (props) => {
@@ -36,7 +36,13 @@ const Event = (props) => {
   return (
     <Switch>
       <Route path={`${match.path}/availability`}>
-        {userAvail && <Availability avail={userAvail} />}
+        {userAvail && (
+          <Availability
+            eventId={id}
+            avail={userAvail.availability}
+            availId={userAvail._id}
+          />
+        )}
       </Route>
     </Switch>
   );

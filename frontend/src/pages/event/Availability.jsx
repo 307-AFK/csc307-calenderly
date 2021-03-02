@@ -10,7 +10,7 @@ import {
 import Calendar from '../../components/Calendar';
 
 const Availability = (props) => {
-  const { avail } = props;
+  const { eventId, avail, availId } = props;
   const [unsaved, setUnsaved] = useState(false);
 
   const updateAvailability = (index, status) => {
@@ -21,8 +21,17 @@ const Availability = (props) => {
 
   const saveAvailability = () => {
     if (!unsaved) return;
-    setUnsaved(false);
-    console.log(avail);
+
+    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${eventId}/availability`, {
+      method: 'POST', // TODO: change to PUT request
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ avail, availId }),
+    })
+      .then((res) => res.json())
+      .then(() => setUnsaved(false));
   };
 
   return (
@@ -51,6 +60,8 @@ Availability.propTypes = {
     date: PropTypes.date,
     times: PropTypes.arrayOf(PropTypes.bool),
   })).isRequired,
+  availId: PropTypes.string.isRequired,
+  eventId: PropTypes.string.isRequired,
 };
 
 export default Availability;
