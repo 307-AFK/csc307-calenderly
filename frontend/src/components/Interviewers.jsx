@@ -3,6 +3,10 @@ import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Button, Form, Input } from 'antd';
 
+import {
+  MinusSquareOutlined,
+} from '@ant-design/icons';
+
 const Interviewers = ({ users, updateEventInfo }) => (
   <>
     <div>Current Interviewers:</div>
@@ -15,6 +19,12 @@ const Interviewers = ({ users, updateEventInfo }) => (
 
 const Interviewer = ({ userId }) => {
   const [userInfo, updateUserInfo] = useState({});
+
+  const removeUser = () => {
+    console.log(userId);
+    // TODO: remove user `userId`
+    // update state
+  };
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_SERVER_URL}/users/${userId}`,
@@ -30,6 +40,7 @@ const Interviewer = ({ userId }) => {
       (
       {userInfo.email}
       )
+      <Button danger type='text' icon={<MinusSquareOutlined />} onClick={removeUser} />
     </div>
   );
 };
