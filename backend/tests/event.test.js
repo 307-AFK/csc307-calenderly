@@ -15,8 +15,6 @@ const eventData = {
   description: 'bar',
   startDate: '2021-02-17T18:10:00.064Z',
   endDate: '2021-03-17T18:10:00.064Z',
-  interviewersNeeded: 2,
-  availabilityIncrement: 10,
 };
 
 describe('Test event endpoints', () => {
@@ -45,8 +43,6 @@ describe('Test event endpoints', () => {
     expect(theEvent.description).toBe(eventData.description);
     expect(theEvent.startDate).toBe(eventData.startDate);
     expect(theEvent.endDate).toBe(eventData.endDate);
-    expect(theEvent.interviewersNeeded).toBe(eventData.interviewersNeeded);
-    expect(theEvent.availabilityIncrement).toBe(eventData.availabilityIncrement);
     expect(theEvent.interviewers[0].userId).toBe(eventData.eventCreator);
 
     // check that our created event exists in the creator's list of events
