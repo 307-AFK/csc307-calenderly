@@ -29,57 +29,47 @@ const TimeSlotBtn = (props) => {
 const Calendar = (props) => {
   const { times, toggled } = props;
 
-  const columns = [
-    { title: 'Times', key: 'times' },
-    { title: 'Monday', key: 'mon' },
-    { title: 'Tuesday', key: 'tues' },
-    { title: 'Wednesday', key: 'wed' },
-    { title: 'Thursday', key: 'thurs' },
-    { title: 'Friday', key: 'fri' },
-  ];
-
   // this can be found in the actual availability
-  const data = [
-    { key: 0, time: '9:00 am' },
-    { key: 1, time: '10:00 am' },
-    { key: 2, time: '11:00 am' },
-    { key: 3, time: '12:00 pm' },
-    { key: 4, time: '1:00 pm' },
-    { key: 5, time: '2:00 pm' },
-    { key: 6, time: '3:00 pm' },
-    { key: 7, time: '4:00 pm' },
+  const hours = [
+    { time: '9:00 am' },
+    { time: '10:00 am' },
+    { time: '11:00 am' },
+    { time: '12:00 pm' },
+    { time: '1:00 pm' },
+    { time: '2:00 pm' },
+    { time: '3:00 pm' },
+    { time: '4:00 pm' },
   ];
 
-  const setAvailability = () => {
-    data.forEach((d, i) => {
-      data[i].mon = times[0][i];
-      data[i].tues = times[1][i];
-      data[i].wed = times[2][i];
-      data[i].thurs = times[3][i];
-      data[i].fri = times[4][i];
-    });
-  };
+  const timeCols = [{ title: 'Times', key: 'times', vals: hours }];
 
-  setAvailability();
+  const dayCols = times ? times.map((t) => (
+    // eslint-disable-next-line no-underscore-dangle
+    { title: t.date.split('T')[0], key: t._id, vals: t.times }
+  )) : null;
+
+  const columns = timeCols.concat(dayCols);
+  const rows = hours.map((h, i) => columns.map((c) => (c ? c.vals[i] : false)));
 
   return (
     <>
       <Row>
-        {columns.map((c) => (
-          <Col key={c.key} span={4}>
+        <Col span={4} align='center'><b>Times</b></Col>
+        {dayCols && dayCols.map((c) => (
+          <Col key={c.key} span={4} align='center'>
             <b>{c.title}</b>
           </Col>
         ))}
       </Row>
 
-      { data.map((d) => (
-        <Row key={d.key} gutter={[4, 90]} className={styles.calRow}>
-          <Col span={4}>{d.time}</Col>
-          <TimeSlotBtn val={d.mon} tog={toggled} />
-          <TimeSlotBtn val={d.tues} tog={toggled} />
-          <TimeSlotBtn val={d.wed} tog={toggled} />
-          <TimeSlotBtn val={d.thurs} tog={toggled} />
-          <TimeSlotBtn val={d.fri} tog={toggled} />
+      {rows.map((r, i) => (
+        <Row key={r[0].time} gutter={4} className={styles.calRow}>
+          {r.map((c, j) => {
+            if (j === 0) {
+              return <Col key={(i, j)} span={4} align='right'>{c.time}</Col>;
+            }
+            return <TimeSlotBtn key={(i, j)} val={c} tog={toggled} />;
+          })}
         </Row>
       ))}
     </>
@@ -92,7 +82,10 @@ TimeSlotBtn.propTypes = {
 };
 
 Calendar.propTypes = {
-  times: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.bool)).isRequired,
+  times: PropTypes.arrayOf(PropTypes.shape({
+    date: PropTypes.date,
+    times: PropTypes.arrayOf(PropTypes.bool),
+  })).isRequired,
   toggled: PropTypes.func.isRequired,
 };
 

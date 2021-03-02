@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import {
   Switch,
   Route,
@@ -8,19 +9,44 @@ import {
 
 import Availability from './event/Availability';
 
-const Event = () => {
+const getUserAvail = (userId, avails) => {
+  const avail = avails.filter((a) => a.userId === userId);
+  return avail[0].availability;
+};
+
+const Event = (props) => {
+  const { user } = props;
   const match = useRouteMatch();
   const { id } = useParams();
+  const [event, setEvent] = useState(null);
+  let userAvail = null;
 
-  console.log(id);
+  useEffect(() => {
+    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${id}`,
+      { credentials: 'include' })
+      .then((res) => res.json())
+      .then((e) => setEvent(e));
+  }, []);
+
+  if (event) {
+    userAvail = getUserAvail(user.id,
+      event.interviewers.concat(event.interviewees));
+  }
 
   return (
     <Switch>
       <Route path={`${match.path}/availability`}>
-        <Availability />
+        {userAvail && <Availability avail={userAvail} />}
       </Route>
     </Switch>
   );
+};
+
+Event.propTypes = {
+  user: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default Event;
