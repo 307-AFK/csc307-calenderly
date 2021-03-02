@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 import Events from './pages/Events';
 import Event from './pages/Event';
 import CreateEvent from './pages/CreateEvent';
+import UpdateEvent from './pages/UpdateEvent';
 
 import './App.less';
 
@@ -44,6 +45,9 @@ const App = () => {
                 </Route>
                 <Route path='/create'>
                   <CreateEvent user={profile} />
+                </Route>
+                <Route path='/event/:eventId/update'>
+                  <UpdateEvent user={profile} />
                 </Route>
                 <Route path='/event/:id'>
                   <Event user={profile} />
