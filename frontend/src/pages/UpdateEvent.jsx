@@ -24,6 +24,7 @@ const UpdateEvent = ({ user }) => {
   return (
     <div>
       <EventDetails
+        updateEventInfo={updateEventInfo}
         eventInfo={eventInfo}
         eventId={eventId}
       />

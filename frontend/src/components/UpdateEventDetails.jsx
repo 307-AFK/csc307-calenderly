@@ -10,7 +10,7 @@ import {
 const { RangePicker } = DatePicker;
 
 const EventDetails = (props) => {
-  const { eventInfo, eventId } = props;
+  const { updateEventInfo, eventInfo, eventId } = props;
   const onFinish = (values) => {
     fetch(`${process.env.REACT_APP_SERVER_URL}/events/${eventId}/update`,
       {
@@ -24,6 +24,11 @@ const EventDetails = (props) => {
           endDate: values.daterange[1],
           interviewersNeeded: values.interviewersNeeded,
         }),
+      }).then((res) => res.json())
+      .then((e) => {
+        if (e) {
+          updateEventInfo(e.event);
+        }
       });
   };
   return (
@@ -73,6 +78,7 @@ const EventDetails = (props) => {
 };
 
 EventDetails.propTypes = {
+  updateEventInfo: PropTypes.func.isRequired,
   eventInfo: PropTypes.shape({
     title: PropTypes.string.isRequired,
     startDate: PropTypes.string.isRequired,

@@ -40,6 +40,7 @@ const Event = (props) => {
           <Availability
             eventId={id}
             avail={userAvail.availability}
+            // eslint-disable-next-line no-underscore-dangle
             availId={userAvail._id}
           />
         )}

@@ -103,7 +103,7 @@ module.exports.updateEvent = async (req, res) => {
       e.endDate = req.body.endDate;
       e.interviewersNeeded = req.body.interviewersNeeded;
       e.save().then(() => {
-        res.status(204).send('Event updated');
+        res.status(204).send({message: 'Event updated', event:e})
       });
     } else {
       res.status(404).send('Event not found');
