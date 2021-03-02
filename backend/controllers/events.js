@@ -24,19 +24,37 @@ module.exports.getEvent = async (req, res) => {
   }
 };
 
+const availabilityArray = (startDate, endDate) => {
+  const aval = [];
+
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  const times = new Array(8);
+  times.fill(false);
+
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    aval.push({ date: new Date(d), times });
+  }
+
+  return aval;
+};
+
 module.exports.createEvent = async (req, res) => {
+  const avail = availabilityArray(req.body.startDate, req.body.endDate);
   const eventCreator = {
     userId: mongoose.Types.ObjectId(req.body.eventCreator),
+    availability: avail,
   };
+
   const newEvent = new Event({
     title: req.body.title,
     description: req.body.description,
     interviewers: [eventCreator],
     startDate: req.body.startDate,
     endDate: req.body.endDate,
-    interviewersNeeded: req.body.interviewersNeeded,
-    availabilityIncrement: req.body.availabilityIncrement,
   });
+
   // save event
   newEvent.save().then((event) => {
     if (event) {
