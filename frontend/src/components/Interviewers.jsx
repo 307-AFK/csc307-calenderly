@@ -9,7 +9,7 @@ import {
 
 const Interviewers = ({ currUserId, users, updateEventInfo }) => (
   <>
-    <div>Current Interviewers:</div>
+    <h2>Current Interviewers:</h2>
     {
       users.map((i) => (
         <Interviewer
