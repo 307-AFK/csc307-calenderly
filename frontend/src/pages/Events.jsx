@@ -41,12 +41,12 @@ const Events = ({ user }) => {
 
         <h2>Interviewer</h2>
         {interviewerEvents.map((e) => (
-          <EventCard key={e.eventId} event={e} isInterviewer />))}
+          <EventCard key={e._id} event={e} isInterviewer />))}
 
         <Divider />
         <h2>Interviewee</h2>
         {intervieweeEvents.map((e) => (
-          <EventCard key={e.eventId} event={e} />))}
+          <EventCard key={e._id} event={e} />))}
       </div>
     </>
   );
