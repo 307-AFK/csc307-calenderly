@@ -10,10 +10,29 @@ import {
 import Calendar from '../../components/Calendar';
 
 const Availability = (props) => {
-  // TODO: true saving logic may have to be moved into the calendar
+  const { eventId, avail, availId } = props;
   const [unsaved, setUnsaved] = useState(false);
 
-  const { avail } = props;
+  const updateAvailability = (index, status) => {
+    const [day, time] = index;
+    avail[day].times[time] = status;
+    setUnsaved(true);
+  };
+
+  const saveAvailability = () => {
+    if (!unsaved) return;
+
+    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${eventId}/availability`, {
+      method: 'POST', // TODO: change to PUT request
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ avail, availId }),
+    })
+      .then((res) => res.json())
+      .then(() => setUnsaved(false));
+  };
 
   return (
     <>
@@ -23,10 +42,10 @@ const Availability = (props) => {
       />
       <Row>
         <Col offset={2} span={20}>
-          <Calendar times={avail} toggled={setUnsaved} />
+          <Calendar times={avail} toggled={updateAvailability} />
           <Button
             type={unsaved ? 'primary' : 'default'}
-            onClick={() => setUnsaved(false)}
+            onClick={saveAvailability}
           >
             Save
           </Button>
@@ -41,6 +60,8 @@ Availability.propTypes = {
     date: PropTypes.date,
     times: PropTypes.arrayOf(PropTypes.bool),
   })).isRequired,
+  availId: PropTypes.string.isRequired,
+  eventId: PropTypes.string.isRequired,
 };
 
 export default Availability;
