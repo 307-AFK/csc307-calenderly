@@ -7,23 +7,41 @@ import {
   MinusSquareOutlined,
 } from '@ant-design/icons';
 
-const Interviewers = ({ users, updateEventInfo }) => (
+const Interviewers = ({ currUserId, users, updateEventInfo }) => (
   <>
     <div>Current Interviewers:</div>
     {
-      users.map((i) => <Interviewer key={i.userId} userId={i.userId} />)
+      users.map((i) => (
+        <Interviewer
+          key={i.userId}
+          currUserId={currUserId}
+          userId={i.userId}
+          updateEventInfo={updateEventInfo}
+        />
+      ))
     }
     <AddInterviewerForm updateEventInfo={updateEventInfo} />
   </>
 );
 
-const Interviewer = ({ userId }) => {
+const Interviewer = ({ currUserId, userId, updateEventInfo }) => {
   const [userInfo, updateUserInfo] = useState({});
 
+  const { eventId } = useParams();
+
   const removeUser = () => {
-    console.log(userId);
-    // TODO: remove user `userId`
-    // update state
+    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${eventId}/interviewers`,
+      {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+        }),
+      }).then((res) => res.json())
+      .then((updatedEvent) => {
+        updateEventInfo(updatedEvent);
+      });
   };
 
   useEffect(() => {
@@ -34,6 +52,16 @@ const Interviewer = ({ userId }) => {
       });
   }, [userId]);
 
+  if (userId === currUserId) {
+    return (
+      <div>
+        {userInfo.name}
+        (
+        {userInfo.email}
+        )
+      </div>
+    );
+  }
   return (
     <div>
       {userInfo.name}
@@ -88,10 +116,13 @@ Interviewers.propTypes = {
     PropTypes.shape({ userId: PropTypes.string }),
   ).isRequired,
   updateEventInfo: PropTypes.func.isRequired,
+  currUserId: PropTypes.string.isRequired,
 };
 
 Interviewer.propTypes = {
   userId: PropTypes.string.isRequired,
+  currUserId: PropTypes.string.isRequired,
+  updateEventInfo: PropTypes.func.isRequired,
 };
 
 AddInterviewerForm.propTypes = {
