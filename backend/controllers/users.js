@@ -54,7 +54,7 @@ module.exports.getEventsAsRole = async (req, res) => {
     res.status(400).send('invalid userId');
   }
 
-  const user = await User.findOne({ _id: userid, 'events.role': role }, 'events')
-    .populate('events.eventId', 'title description');
-  res.status(200).json(user.events);
+  const user = await User.findById(userid).populate('events.eventId', 'title description');
+
+  res.status(200).json(user.events.filter((e) => e.role === role));
 };
