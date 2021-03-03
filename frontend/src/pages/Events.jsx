@@ -18,11 +18,11 @@ const Events = ({ user }) => {
   useEffect(() => {
     fetch(`${eventEndpoint}/interviewer`, { credentials: 'include' })
       .then((res) => res.json())
-      .then((events) => updateInterviewerEvents(events));
+      .then((events) => updateInterviewerEvents(events.map((e) => e.eventId)));
 
     fetch(`${eventEndpoint}/interviewee`, { credentials: 'include' })
       .then((res) => res.json())
-      .then((events) => updateIntervieweeEvents(events));
+      .then((events) => updateIntervieweeEvents(events.map((e) => e.eventId)));
   }, []);
 
   return (

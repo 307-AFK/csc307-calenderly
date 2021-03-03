@@ -47,28 +47,14 @@ module.exports.getEvents = async (req, res) => {
   }
 };
 
-module.exports.getEventsAsInterviewer = async (req, res) => {
-  if (mongoose.Types.ObjectId.isValid(req.params.userid)) {
-    const user = await User.findById(req.params.userid);
-    if (user) {
-      res.send(user.events.filter((e) => e.role === 'interviewer'));
-    } else {
-      res.status(404).send('User not found');
-    }
-  } else {
-    res.status(400).send('Invalid user id');
-  }
-};
+module.exports.getEventsAsRole = async (req, res) => {
+  const { userid, role } = req.params;
 
-module.exports.getEventsAsInterviewee = async (req, res) => {
-  if (mongoose.Types.ObjectId.isValid(req.params.userid)) {
-    const user = await User.findById(req.params.userid);
-    if (user) {
-      res.send(user.events.filter((e) => e.role === 'interviewee'));
-    } else {
-      res.status(404).send('User not found');
-    }
-  } else {
-    res.status(400).send('Invalid user id');
+  if (!mongoose.Types.ObjectId.isValid(userid)) {
+    res.status(400).send('invalid userId');
   }
+
+  const user = await User.findOne({ _id: userid, 'events.role': role }, 'events')
+    .populate('events.eventId', 'title description');
+  res.status(200).json(user.events);
 };

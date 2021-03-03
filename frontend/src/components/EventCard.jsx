@@ -7,15 +7,15 @@ import ButtonLink from './ButtonLink';
 
 const EventCard = (props) => {
   const { event, isInterviewer } = props;
-  const linkBase = `event/${event.eventId}`;
+  const linkBase = `event/${event._id}`;
 
   return (
     <Card width={24}>
       <Row justify='space-between' align='middle'>
         <Space>
           <p>
-            event:
-            {event.eventId}
+            {event.title}
+            {event.description && ` -  ${event.description}`}
           </p>
         </Space>
 
@@ -34,7 +34,9 @@ const EventCard = (props) => {
 
 EventCard.propTypes = {
   event: PropTypes.shape({
-    eventId: PropTypes.string.isRequired,
+    _id: PropTypes.string.isRequired,
+    title: PropTypes.string,
+    description: PropTypes.string,
   }).isRequired,
   isInterviewer: PropTypes.bool,
 };
