@@ -205,3 +205,31 @@ module.exports.addInterviewee = async (req, res) => {
     });
   });
 };
+
+module.exports.deleteInterviewer = async (req, res) => {
+  await Event.updateOne(
+    { _id: req.params.eventid },
+    { $pull: { interviewers: { userId: req.body.userId } } },
+  ).then(() => {
+    User.updateOne(
+      { _id: req.body.userId },
+      { $pull: { events: { eventId: req.params.eventid, role: 'interviewer' } } },
+    );
+  });
+  const updatedEvent = await Event.findById(req.params.eventid);
+  res.status(200).send(updatedEvent);
+};
+
+module.exports.deleteInterviewee = async (req, res) => {
+  await Event.updateOne(
+    { _id: req.params.eventid },
+    { $pull: { interviewees: { userId: req.body.userId } } },
+  ).then(() => {
+    User.updateOne(
+      { _id: req.body.userId },
+      { $pull: { events: { eventId: req.params.eventid, role: 'interviewee' } } },
+    );
+  });
+  const updatedEvent = await Event.findById(req.params.eventid);
+  res.status(200).send(updatedEvent);
+};

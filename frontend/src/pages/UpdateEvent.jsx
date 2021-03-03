@@ -29,7 +29,11 @@ const UpdateEvent = ({ user }) => {
       event:
       {eventInfo.title}
       <br />
-      <Interviewers users={eventInfo.interviewers} updateEventInfo={updateEventInfo} />
+      <Interviewers
+        currUserId={user.id}
+        users={eventInfo.interviewers}
+        updateEventInfo={updateEventInfo}
+      />
       <Interviewees users={eventInfo.interviewees} updateEventInfo={updateEventInfo} />
     </div>
   );

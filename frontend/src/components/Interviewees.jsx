@@ -3,18 +3,45 @@ import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Button, Form, Input } from 'antd';
 
+import {
+  MinusSquareOutlined,
+} from '@ant-design/icons';
+
 const Interviewees = ({ users, updateEventInfo }) => (
   <>
     <div>Current Interviewees:</div>
     {
-      users.map((i) => <Interviewee key={i.userId} userId={i.userId} />)
+      users.map((i) => (
+        <Interviewee
+          key={i.userId}
+          userId={i.userId}
+          updateEventInfo={updateEventInfo}
+        />
+      ))
     }
     <AddIntervieweeForm updateEventInfo={updateEventInfo} />
   </>
 );
 
-const Interviewee = ({ userId }) => {
+const Interviewee = ({ userId, updateEventInfo }) => {
   const [userInfo, updateUserInfo] = useState({});
+
+  const { eventId } = useParams();
+
+  const removeUser = () => {
+    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${eventId}/interviewees`,
+      {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+        }),
+      }).then((res) => res.json())
+      .then((updatedEvent) => {
+        updateEventInfo(updatedEvent);
+      });
+  };
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_SERVER_URL}/users/${userId}`,
@@ -30,6 +57,7 @@ const Interviewee = ({ userId }) => {
       (
       {userInfo.email}
       )
+      <Button danger type='text' icon={<MinusSquareOutlined />} onClick={removeUser} />
     </div>
   );
 };
@@ -81,6 +109,7 @@ Interviewees.propTypes = {
 
 Interviewee.propTypes = {
   userId: PropTypes.string.isRequired,
+  updateEventInfo: PropTypes.func.isRequired,
 };
 
 AddIntervieweeForm.propTypes = {
