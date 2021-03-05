@@ -10,7 +10,9 @@ import Card from './components/Card';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
 import Events from './pages/Events';
+import Event from './pages/Event';
 import CreateEvent from './pages/CreateEvent';
+import UpdateEvent from './pages/UpdateEvent';
 
 import './App.less';
 
@@ -30,19 +32,25 @@ const App = () => {
   return (
     <BrowserRouter>
       { profile ? (
-        <Card width={16}>
+        <Card width={16} page>
           <Layout>
             <Sidebar />
             <Content>
               <Switch>
                 <Route exact path='/'>
-                  <Events />
+                  <Events user={profile} />
                 </Route>
                 <Route path='/profile'>
                   <Profile user={profile} />
                 </Route>
                 <Route path='/create'>
                   <CreateEvent user={profile} />
+                </Route>
+                <Route path='/event/:eventId/update'>
+                  <UpdateEvent user={profile} />
+                </Route>
+                <Route path='/event/:id'>
+                  <Event user={profile} />
                 </Route>
               </Switch>
             </Content>

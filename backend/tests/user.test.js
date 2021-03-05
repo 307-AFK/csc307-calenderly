@@ -6,7 +6,7 @@ const request = supertest(app);
 const User = require('../models/User');
 
 const userData = new User({
-  email: 'test.user@gmail.com',
+  email: 'test.user2@gmail.com',
   name: 'Test User',
   picture: 'pictureString',
   googleId: 'googleIdString',
@@ -48,7 +48,7 @@ describe('Test user endpoints', () => {
     // make a second temporary user so getUsers is meaningful and
     // we have a user to delete
     const testUser2 = await new User({
-      email: 'test.user2@gmail.com',
+      email: 'test.user3@gmail.com',
       name: 'Test User 2',
     }).save();
     const users = (await request.get('/users')).body;
@@ -67,9 +67,9 @@ describe('Test user endpoints', () => {
     // make a new user and add to the event
     const newInterviewer = await new User({
       name: 'new interviewer',
-      email: 'new.interviewer@gmail.com',
+      email: 'new.interviewer1@gmail.com',
     }).save();
-    const postMessage = (await request.post(`/events/${theEvent._id}/interviewers`).send({ userId: newInterviewer._id })).text;
+    const postMessage = (await request.post(`/events/${theEvent._id}/interviewers`).send({ email: newInterviewer.email })).body.message;
     expect(postMessage).toBe('1 user(s) added successfully');
 
     // make sure the event is in testUser's and newInterviewer's events[]
@@ -99,11 +99,11 @@ describe('Test user endpoints', () => {
     // make a new user and add to the events as interviewee and interviewer, respectively
     const newUser = await new User({
       name: 'new user',
-      email: 'new.user@gmail.com',
+      email: 'new.user1@gmail.com',
     }).save();
-    const postMessage = (await request.post(`/events/${eventAsInterviewer._id}/interviewers`).send({ userId: newUser._id })).text;
+    const postMessage = (await request.post(`/events/${eventAsInterviewer._id}/interviewers`).send({ email: newUser.email })).body.message;
     expect(postMessage).toBe('1 user(s) added successfully');
-    const postMessage2 = (await request.post(`/events/${eventAsInterviewee._id}/interviewees`).send({ userId: newUser._id })).text;
+    const postMessage2 = (await request.post(`/events/${eventAsInterviewee._id}/interviewees`).send({ email: newUser.email })).body.message;
     expect(postMessage2).toBe('1 user(s) added successfully');
 
     // make sure newUser's list of events is correct
