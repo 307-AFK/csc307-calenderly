@@ -3,18 +3,46 @@ import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Button, Form, Input } from 'antd';
 
-const Interviewers = ({ users, updateEventInfo }) => (
+import {
+  MinusSquareOutlined,
+} from '@ant-design/icons';
+
+const Interviewers = ({ currUserId, users, updateEventInfo }) => (
   <>
-    <div>Current Interviewers:</div>
+    <h2>Current Interviewers:</h2>
     {
-      users.map((i) => <Interviewer key={i.userId} userId={i.userId} />)
+      users.map((i) => (
+        <Interviewer
+          key={i.userId}
+          currUserId={currUserId}
+          userId={i.userId}
+          updateEventInfo={updateEventInfo}
+        />
+      ))
     }
     <AddInterviewerForm updateEventInfo={updateEventInfo} />
   </>
 );
 
-const Interviewer = ({ userId }) => {
+const Interviewer = ({ currUserId, userId, updateEventInfo }) => {
   const [userInfo, updateUserInfo] = useState({});
+
+  const { eventId } = useParams();
+
+  const removeUser = () => {
+    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${eventId}/interviewers`,
+      {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+        }),
+      }).then((res) => res.json())
+      .then((updatedEvent) => {
+        updateEventInfo(updatedEvent);
+      });
+  };
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_SERVER_URL}/users/${userId}`,
@@ -24,12 +52,23 @@ const Interviewer = ({ userId }) => {
       });
   }, [userId]);
 
+  if (userId === currUserId) {
+    return (
+      <div>
+        {userInfo.name}
+        (
+        {userInfo.email}
+        )
+      </div>
+    );
+  }
   return (
     <div>
       {userInfo.name}
       (
       {userInfo.email}
       )
+      <Button danger type='text' icon={<MinusSquareOutlined />} onClick={removeUser} />
     </div>
   );
 };
@@ -77,10 +116,13 @@ Interviewers.propTypes = {
     PropTypes.shape({ userId: PropTypes.string }),
   ).isRequired,
   updateEventInfo: PropTypes.func.isRequired,
+  currUserId: PropTypes.string.isRequired,
 };
 
 Interviewer.propTypes = {
   userId: PropTypes.string.isRequired,
+  currUserId: PropTypes.string.isRequired,
+  updateEventInfo: PropTypes.func.isRequired,
 };
 
 AddInterviewerForm.propTypes = {

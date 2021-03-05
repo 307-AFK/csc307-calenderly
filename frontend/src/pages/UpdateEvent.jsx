@@ -22,14 +22,26 @@ const UpdateEvent = ({ user }) => {
     return <div>You do not have permission to edit this event</div>;
   }
   return (
-    <div>
+    <>
+      <h2>{eventInfo.title}</h2>
+      (eventId:
+      {eventId}
+      )
+      <br />
+      <h2>Description:</h2>
+      {eventInfo.description}
       <EventDetails
         updateEventInfo={updateEventInfo}
         eventInfo={eventInfo}
         eventId={eventId}
       />
-      <Interviewers users={eventInfo.interviewers} />
-    </div>
+      <Interviewers
+        currUserId={user.id}
+        users={eventInfo.interviewers}
+        updateEventInfo={updateEventInfo}
+      />
+      <Interviewees users={eventInfo.interviewees} updateEventInfo={updateEventInfo} />
+    </>
   );
 };
 

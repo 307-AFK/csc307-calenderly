@@ -7,7 +7,6 @@ router.get('/', users.getUsers);
 router.get('/:userid', users.getUser);
 router.delete('/:userid', users.deleteUser);
 router.get('/:userid/events', users.getEvents);
-router.get('/:userid/events/interviewer', users.getEventsAsInterviewer);
-router.get('/:userid/events/interviewee', users.getEventsAsInterviewee);
+router.get('/:userid/events/:role', users.getEventsAsRole);
 
 module.exports = router;

@@ -92,23 +92,23 @@ module.exports.deleteEvent = async (req, res) => {
   });
 };
 
-module.exports.updateEvent = async (req, res) => {
-  if (mongoose.Types.ObjectId.isValid(req.params.eventid)) {
-    const e = await Event.findById(req.params.eventid);
-    if (e) {
-      console.log(e);
-      e.title = req.body.title;
-      e.description = req.body.description;
-      e.startDate = req.body.startDate;
-      e.endDate = req.body.endDate;
-      e.interviewersNeeded = req.body.interviewersNeeded;
-      e.save().then(() => {
-        res.status(204).send({message: 'Event updated', event:e})
+module.exports.getTimeSlots = async (req, res) => {
+  const event = await Event.findById(req.params.eventid);
+  const { interviewers } = event;
+  const model = interviewers[0].availability;
+
+  for (let i = 0; i < model.length; i += 1) {
+    for (let j = 0; j < model[i].times.length; j += 1) {
+      let numInterviewersFree = 0;
+      interviewers.forEach((intv) => {
+        if (intv.availability[i].times[j]) {
+          numInterviewersFree += 1;
+        }
       });
-    } else {
-      res.status(404).send('Event not found');
+      model[i].times[j] = numInterviewersFree >= event.interviewersNeeded;
     }
   }
+  res.status(200).send(model);
 };
 
 module.exports.getEventInterviewers = async (req, res) => {
@@ -170,9 +170,11 @@ module.exports.addInterviewer = async (req, res) => {
     res.status(400).send('Invalid event id');
   }
 
+  const event = await Event.findById(req.params.eventid);
+  const avail = availabilityArray(event.startDate, event.endDate);
   Event.updateOne(
     { _id: req.params.eventid, 'interviewers.userId': { $ne: user._id }, 'interviewees.userId': { $ne: user._id } },
-    { $push: { interviewers: { userId: user._id } } },
+    { $push: { interviewers: { userId: user._id, availability: avail } } },
   ).then((updated) => {
     if (!updated) {
       res.status(404).send('Couldn\'t update event');
@@ -223,4 +225,51 @@ module.exports.addInterviewee = async (req, res) => {
           .send({ message: `${updated.n} user(s) added successfully`, event: updatedEvent }));
     });
   });
+};
+
+module.exports.deleteInterviewer = async (req, res) => {
+  await Event.updateOne(
+    { _id: req.params.eventid },
+    { $pull: { interviewers: { userId: req.body.userId } } },
+  ).then(() => {
+    User.updateOne(
+      { _id: req.body.userId },
+      { $pull: { events: { eventId: req.params.eventid, role: 'interviewer' } } },
+    );
+  });
+  const updatedEvent = await Event.findById(req.params.eventid);
+  res.status(200).send(updatedEvent);
+};
+
+module.exports.deleteInterviewee = async (req, res) => {
+  await Event.updateOne(
+    { _id: req.params.eventid },
+    { $pull: { interviewees: { userId: req.body.userId } } },
+  ).then(() => {
+    User.updateOne(
+      { _id: req.body.userId },
+      { $pull: { events: { eventId: req.params.eventid, role: 'interviewee' } } },
+    );
+  });
+  const updatedEvent = await Event.findById(req.params.eventid);
+  res.status(200).send(updatedEvent);
+};
+
+module.exports.updateEvent = async (req, res) => {
+  if (mongoose.Types.ObjectId.isValid(req.params.eventid)) {
+    const e = await Event.findById(req.params.eventid);
+    if (e) {
+      console.log(e);
+      e.title = req.body.title;
+      e.description = req.body.description;
+      e.startDate = req.body.startDate;
+      e.endDate = req.body.endDate;
+      e.interviewersNeeded = req.body.interviewersNeeded;
+      e.save().then(() => {
+        res.status(204).send({message: 'Event updated', event:e})
+      });
+    } else {
+      res.status(404).send('Event not found');
+    }
+  }
 };
