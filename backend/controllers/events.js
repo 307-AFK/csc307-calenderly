@@ -159,6 +159,20 @@ module.exports.updateAvailability = async (req, res) => {
   res.status(201).send();
 };
 
+module.exports.updateTimeSlot = async (req, res) => {
+  const eventId = req.params.eventid;
+
+  if (!mongoose.Types.ObjectId.isValid(eventId)) {
+    res.status(400).send('Invalid event id');
+  }
+
+  await Event.findOneAndUpdate({
+    _id: eventId, interviewees: { $elemMatch: { userId: req.body.userId } },
+  }, { $set: { 'interviewees.$.timeChosen': req.body.timeChosen } });
+
+  res.status(201).send();
+};
+
 module.exports.addInterviewer = async (req, res) => {
   // get user by email
   const user = await User.findOne({ email: req.body.email });

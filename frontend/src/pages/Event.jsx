@@ -47,6 +47,7 @@ const Event = (props) => {
           : (
             <TimeSlotSelect
               event={event}
+              userId={user.id}
             />
           ))}
       </Route>
