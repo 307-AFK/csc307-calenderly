@@ -254,3 +254,22 @@ module.exports.deleteInterviewee = async (req, res) => {
   const updatedEvent = await Event.findById(req.params.eventid);
   res.status(200).send(updatedEvent);
 };
+
+module.exports.updateEvent = async (req, res) => {
+  if (mongoose.Types.ObjectId.isValid(req.params.eventid)) {
+    const e = await Event.findById(req.params.eventid);
+    if (e) {
+      console.log(e);
+      e.title = req.body.title;
+      e.description = req.body.description;
+      e.startDate = req.body.startDate;
+      e.endDate = req.body.endDate;
+      e.interviewersNeeded = req.body.interviewersNeeded;
+      e.save().then(() => {
+        res.status(204).send({message: 'Event updated', event:e})
+      });
+    } else {
+      res.status(404).send('Event not found');
+    }
+  }
+};
