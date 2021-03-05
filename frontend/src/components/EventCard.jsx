@@ -20,12 +20,19 @@ const EventCard = (props) => {
         </Space>
 
         <Space>
-          { isInterviewer && (
-            <ButtonLink link={`${linkBase}/update`}>Update Event</ButtonLink>
-          )}
-          <ButtonLink link={`${linkBase}/availability`}>
-            Set Availability
-          </ButtonLink>
+          { isInterviewer ? (
+            <>
+              <ButtonLink link={`${linkBase}/update`}>Update Event</ButtonLink>
+              <ButtonLink link={`${linkBase}/availability`}>
+                Set Availability
+              </ButtonLink>
+            </>
+          )
+            : (
+              <ButtonLink link={`${linkBase}/availability`}>
+                Select Timeslot
+              </ButtonLink>
+            )}
         </Space>
       </Row>
     </Card>

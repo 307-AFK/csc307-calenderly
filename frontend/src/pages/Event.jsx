@@ -8,6 +8,7 @@ import {
 } from 'react-router-dom';
 
 import Availability from './event/Availability';
+import TimeSlotSelect from './event/TimeSlotSelect';
 
 const getUserAvail = (userId, avails) => {
   const avail = avails.filter((a) => a.userId === userId);
@@ -36,13 +37,20 @@ const Event = (props) => {
   return (
     <Switch>
       <Route path={`${match.path}/availability`}>
-        {userAvail && (
+        {userAvail && (userAvail.availability ? (
           <Availability
             eventId={id}
             avail={userAvail.availability}
             availId={userAvail._id}
           />
-        )}
+        )
+          : (
+            <TimeSlotSelect
+              eventId={id}
+              interviewers={event.interviewers}
+              interviewersNeeded={event.interviewersNeeded}
+            />
+          ))}
       </Route>
     </Switch>
   );

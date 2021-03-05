@@ -7,6 +7,7 @@ router.get('/', events.getEvents);
 router.post('/', events.createEvent);
 router.get('/:eventid', events.getEvent);
 router.delete('/:eventid', events.deleteEvent);
+router.get('/:eventid/timeslots', events.getTimeSlots);
 router.get('/:eventid/interviewers', events.getEventInterviewers);
 router.get('/:eventid/interviewees', events.getEventInterviewees);
 router.post('/:eventid/availability', events.updateAvailability);
