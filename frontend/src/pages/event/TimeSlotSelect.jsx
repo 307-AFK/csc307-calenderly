@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import {
   PageHeader, Form, Radio, Typography, Button,
 } from 'antd';
+import { useForm } from 'antd/lib/form/Form';
 
 const { Title } = Typography;
 
 const TimeSlotSelect = ({ event, userId }) => {
   const [timeSlots, setTimeSlots] = useState([]);
-  const [currTimeSlot, setCurrTimeSlot] = useState(null);
+  const [form] = useForm();
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_SERVER_URL}/events/${event._id}/timeslots`,
@@ -21,8 +22,9 @@ const TimeSlotSelect = ({ event, userId }) => {
     fetch(`${process.env.REACT_APP_SERVER_URL}/events/${event._id}/interviewees`,
       { credentials: 'include' })
       .then((res) => res.json())
-      .then((interviewers) => setCurrTimeSlot(interviewers
-        .find((i) => i.userId === userId).timeChosen));
+      .then((interviewers) => {
+        form.setFieldsValue({ timeSlot: interviewers.find((i) => i.userId === userId).timeChosen });
+      });
   }, []);
 
   const onFinish = ({ timeSlot }) => {
@@ -44,7 +46,7 @@ const TimeSlotSelect = ({ event, userId }) => {
         subTitle='select a time slot for your interview'
       />
       <div className='content'>
-        <Form onFinish={onFinish} initialValues={{ timeSlot: currTimeSlot }}>
+        <Form onFinish={onFinish} form={form}>
           <Form.Item name='timeSlot'>
             <Radio.Group>
               {
