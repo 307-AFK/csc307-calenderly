@@ -217,28 +217,40 @@ module.exports.addInterviewee = async (req, res) => {
   }
   if (!mongoose.Types.ObjectId.isValid(req.params.eventid)) {
     res.status(400).send('Invalid event id');
+    return;
   }
 
-  Event.updateOne(
-    { _id: req.params.eventid, 'interviewees.userId': { $ne: user._id }, 'interviewers.userId': { $ne: user._id } },
-    { $push: { interviewees: { userId: user._id } } },
-  ).then((updated) => {
-    if (!updated) {
-      res.status(404).send('Couldn\'t update event');
-    }
-    // add event to list in user (if not already added)
-    User.updateOne(
-      { _id: user._id, 'events.eventId': { $ne: req.params.eventid } },
-      { $push: { events: { eventId: req.params.eventid, role: 'interviewee' } } },
-    ).then((updatedUser) => {
-      if (!updatedUser) {
-        res.status(404).send('Couldn\'t update user');
+  Event.updateOne({
+    _id: req.params.eventid,
+    'interviewees.userId': { $ne: user._id },
+    'interviewers.userId': { $ne: user._id },
+  }, { $push: { interviewees: { userId: user._id } } })
+    .then((updated) => {
+      if (!updated) {
+        res.status(404).send('Couldn\'t update event');
+        return;
       }
-      Event.findById(req.params.eventid)
-        .then((updatedEvent) => res.status(200)
-          .send({ message: `${updated.n} user(s) added successfully`, event: updatedEvent }));
+
+      // add event to list in user (if not already added)
+      User.updateOne({
+        _id: user._id,
+        'events.eventId': { $ne: req.params.eventid },
+      },
+      { $push: { events: { eventId: req.params.eventid, role: 'interviewee' } } })
+        .then((updatedUser) => {
+          if (!updatedUser) {
+            res.status(404).send('Couldn\'t update user');
+            return;
+          }
+
+          Event.findById(req.params.eventid).then((updatedEvent) => {
+            res.status(200).json({
+              message: `${updated.n} user(s) added successfully`,
+              event: updatedEvent,
+            });
+          });
+        });
     });
-  });
 };
 
 module.exports.deleteInterviewer = async (req, res) => {
@@ -280,7 +292,7 @@ module.exports.updateEvent = async (req, res) => {
       e.endDate = req.body.endDate;
       e.interviewersNeeded = req.body.interviewersNeeded;
       e.save().then(() => {
-        res.status(204).send({message: 'Event updated', event:e})
+        res.status(204).send({ message: 'Event updated', event: e });
       });
     } else {
       res.status(404).send('Event not found');

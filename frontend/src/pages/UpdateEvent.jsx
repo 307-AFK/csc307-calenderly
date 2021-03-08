@@ -2,6 +2,7 @@ import { React, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Interviewers from '../components/Interviewers';
+import Interviewees from '../components/Interviewees';
 import EventDetails from '../components/UpdateEventDetails';
 
 const UpdateEvent = ({ user }) => {
