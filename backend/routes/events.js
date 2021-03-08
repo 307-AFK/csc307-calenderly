@@ -12,6 +12,7 @@ router.get('/:eventid/interviewers', events.getEventInterviewers);
 router.put('/:eventid/update', events.updateEvent);
 router.get('/:eventid/interviewees', events.getEventInterviewees);
 router.post('/:eventid/availability', events.updateAvailability);
+router.post('/:eventid/timeslot', events.updateTimeSlot);
 router.post('/:eventid/interviewers', events.addInterviewer);
 router.post('/:eventid/interviewees', events.addInterviewee);
 router.delete('/:eventid/interviewers', events.deleteInterviewer);

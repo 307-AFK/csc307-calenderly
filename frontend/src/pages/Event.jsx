@@ -47,9 +47,8 @@ const Event = (props) => {
         )
           : (
             <TimeSlotSelect
-              eventId={id}
-              interviewers={event.interviewers}
-              interviewersNeeded={event.interviewersNeeded}
+              event={event}
+              userId={user.id}
             />
           ))}
       </Route>
