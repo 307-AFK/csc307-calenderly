@@ -10,15 +10,17 @@ const { Title } = Typography;
 const TimeSlotSelect = ({ event, userId }) => {
   const [timeSlots, setTimeSlots] = useState([]);
   const [form] = useForm();
+  const [otherInterviewees, setOtherInterviewees] = useState([]);
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_SERVER_URL}/events/${event._id}/timeslots`,
       { credentials: 'include' })
       .then((res) => res.json())
       .then((ts) => setTimeSlots(ts));
-  }, []);
-
-  useEffect(() => {
+    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${event._id}/interviewees`,
+      { credentials: 'include' })
+      .then((res) => res.json())
+      .then((ivs) => setOtherInterviewees(ivs.filter((i) => i.userId !== userId)));
     fetch(`${process.env.REACT_APP_SERVER_URL}/events/${event._id}/interviewees`,
       { credentials: 'include' })
       .then((res) => res.json())
@@ -53,7 +55,7 @@ const TimeSlotSelect = ({ event, userId }) => {
                 timeSlots.map((day) => (
                   <div key={day._id}>
                     <Title level={5}>{day.date.split('T')[0]}</Title>
-                    <Time day={day} />
+                    <Time day={day} otherInterviewees={otherInterviewees} />
                   </div>
                 ))
               }
@@ -70,7 +72,7 @@ const TimeSlotSelect = ({ event, userId }) => {
   );
 };
 
-const Time = ({ day }) => {
+const Time = ({ day, otherInterviewees }) => {
   // this should be found in the actual availability
   const hours = [
     { time: '9:00 am', dateTime: '00:09:00.000' },
@@ -87,11 +89,16 @@ const Time = ({ day }) => {
   return (
     <>
       {
-        day.times.map((t, i) => (
-          t && (
-            <Radio value={`${day.date.split('T')[0]}T${hours[i].dateTime}Z`} key={hours[i].time}>{`${hours[i].time} - ${hours[i + 1].time}`}</Radio>
-          )
-        ))
+        day.times.map((t, i) => {
+          const timeslot = `${day.date.split('T')[0]}T${hours[i].dateTime}Z`;
+          // don't display timeslots that have already been selected by another interviewee
+          if (!otherInterviewees.find((intv) => intv.timeChosen === timeslot)) {
+            return (t && (
+              <Radio value={timeslot} key={hours[i].time}>{`${hours[i].time} - ${hours[i + 1].time}`}</Radio>
+            ));
+          }
+          return false;
+        })
       }
     </>
   );
@@ -111,6 +118,10 @@ Time.propTypes = {
     date: PropTypes.string.isRequired,
     times: PropTypes.arrayOf(PropTypes.bool).isRequired,
   }).isRequired,
+  otherInterviewees: PropTypes.arrayOf(PropTypes.shape({
+    timeChosen: PropTypes.string.isRequired,
+    userId: PropTypes.string.isRequired,
+  })).isRequired,
 };
 
 export default TimeSlotSelect;
