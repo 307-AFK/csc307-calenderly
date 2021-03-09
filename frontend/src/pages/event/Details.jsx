@@ -13,18 +13,11 @@ const splitEE = ([hd, ...tl], signed = [], unsigned = []) => {
   return splitEE(tl, signed, unsigned);
 };
 
-const UserCircle = ({ name, src }) => (
-  <Tooltip title={name} placement='bottom'>
-    <Avatar src={src} />
-  </Tooltip>
-);
-
 const Details = (props) => {
   const { event } = props;
 
   const [assigned, unassigned] = splitEE(event.interviewees);
-
-  console.log(assigned, unassigned);
+  const sortedAssigned = assigned.sort((a, b) => a.timeChosen > b.timeChosen);
 
   return (
     <>
@@ -32,23 +25,27 @@ const Details = (props) => {
       <p>{event.description}</p>
 
       <h2>Interviewees Signed Up</h2>
-      {assigned.map((user) => (
-        <UserCircle name={user.userId.name} src={user.userId.picture} />
-      ))}
+      {sortedAssigned.map((user) => {
+        const [day, time] = user.timeChosen.split('T00:');
+
+        return (
+          <div key={user._id}>
+            <Avatar src={user.userId.picture} />
+            <span>{`${user.userId.name} - ${day} @ ${time.substr(0, 5)}`}</span>
+          </div>
+        );
+      })}
 
       <h2>Interviewees Not Signed Up</h2>
       <Avatar.Group>
         {unassigned.map((user) => (
-          <UserCircle name={user.userId.name} src={user.userId.picture} />
+          <Tooltip key={user._id} title={user.userId.name} placement='bottom'>
+            <Avatar src={user.userId.picture} />
+          </Tooltip>
         ))}
       </Avatar.Group>
     </>
   );
-};
-
-UserCircle.propTypes = {
-  name: PropTypes.string.isRequired,
-  src: PropTypes.string.isRequired,
 };
 
 Details.propTypes = {
