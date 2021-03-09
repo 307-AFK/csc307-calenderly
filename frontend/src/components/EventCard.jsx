@@ -15,8 +15,10 @@ const EventCard = (props) => {
       <Row justify='space-between' align='middle'>
         <Space>
           <Link to={linkBase}>
-            {event.title}
-            {event.description && ` -  ${event.description}`}
+            <u>
+              {event.title}
+              {event.description && ` -  ${event.description}`}
+            </u>
           </Link>
         </Space>
 
