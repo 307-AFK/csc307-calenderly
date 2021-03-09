@@ -44,13 +44,12 @@ const Event = (props) => {
             // eslint-disable-next-line no-underscore-dangle
             availId={userAvail._id}
           />
-        )
-          : (
-            <TimeSlotSelect
-              event={event}
-              userId={user.id}
-            />
-          ))}
+        ) : (
+          <TimeSlotSelect
+            event={event}
+            userId={user.id}
+          />
+        ))}
       </Route>
     </Switch>
   );

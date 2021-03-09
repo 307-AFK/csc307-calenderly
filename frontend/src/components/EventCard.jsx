@@ -27,12 +27,11 @@ const EventCard = (props) => {
                 Set Availability
               </ButtonLink>
             </>
-          )
-            : (
-              <ButtonLink link={`${linkBase}/availability`}>
-                Select Timeslot
-              </ButtonLink>
-            )}
+          ) : (
+            <ButtonLink link={`${linkBase}/availability`}>
+              Select Timeslot
+            </ButtonLink>
+          )}
         </Space>
       </Row>
     </Card>
