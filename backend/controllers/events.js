@@ -13,7 +13,10 @@ module.exports.getEvents = async (req, res) => {
 
 module.exports.getEvent = async (req, res) => {
   if (mongoose.Types.ObjectId.isValid(req.params.eventid)) {
-    const e = await Event.findById(req.params.eventid);
+    const e = await Event
+      .findById(req.params.eventid)
+      .populate('interviewees.userId');
+
     if (e) {
       res.json(e);
     } else {

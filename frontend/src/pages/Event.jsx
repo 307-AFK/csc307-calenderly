@@ -23,7 +23,7 @@ const Event = (props) => {
   const match = useRouteMatch();
   const { id } = useParams();
   const [event, setEvent] = useState(null);
-  let userAvail = null;
+  const [userAvail, setAvail] = useState(null);
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_SERVER_URL}/events/${id}`,
@@ -32,9 +32,10 @@ const Event = (props) => {
       .then((e) => setEvent(e));
   }, []);
 
-  if (event) {
-    userAvail = getUserAvail(user.id,
+  if (event && userAvail === null) {
+    const avail = getUserAvail(user.id,
       event.interviewers.concat(event.interviewees));
+    setAvail(avail);
   }
 
   return (
@@ -51,11 +52,11 @@ const Event = (props) => {
             availId={userAvail._id}
           />
         ) : (
-          <TimeSlotSelect
-            event={event}
-            userId={user.id}
-          />
+          <TimeSlotSelect event={event} userId={user.id} />
         ))}
+
+        {/* TODO this is broken. Clean up ASAP */}
+        {event && !userAvail && <TimeSlotSelect event={event} userId={user.id} />}
       </Route>
       <Route path={`${match.path}/update`}>
         <UpdateEvent user={user} />
