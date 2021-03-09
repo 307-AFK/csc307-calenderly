@@ -11,7 +11,9 @@ const { RangePicker } = DatePicker;
 
 const EventDetails = (props) => {
   const { updateEventInfo, eventInfo, eventId } = props;
+
   const onFinish = (values) => {
+    console.log(values);
     fetch(`${process.env.REACT_APP_SERVER_URL}/events/${eventId}/update`,
       {
         method: 'PUT',
@@ -20,8 +22,8 @@ const EventDetails = (props) => {
         body: JSON.stringify({
           title: values.title,
           description: values.description,
-          startDate: values.daterange[0],
-          endDate: values.daterange[1],
+          startDate: values.daterange ? values.daterange[0] : null,
+          endDate: values.daterange ? values.daterange[1] : null,
           interviewersNeeded: values.interviewersNeeded,
         }),
       }).then((res) => res.json())
