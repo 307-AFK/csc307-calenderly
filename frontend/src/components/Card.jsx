@@ -6,7 +6,7 @@ import '../styles/Card.less';
 
 const Card = (props) => {
   const { width, children, page } = props;
-  const cardClass = `card ${page ? 'page' : ''}`;
+  const cardClass = `card ${page ? 'page' : 'hover'}`;
 
   return (
     <Row justify='center'>
