@@ -7,6 +7,9 @@ import {
   useRouteMatch,
 } from 'react-router-dom';
 
+import UpdateEvent from './UpdateEvent';
+
+import EventDetails from './event/Details';
 import Availability from './event/Availability';
 import TimeSlotSelect from './event/TimeSlotSelect';
 
@@ -36,6 +39,9 @@ const Event = (props) => {
 
   return (
     <Switch>
+      <Route path={`${match.path}/`} exact>
+        {event && <EventDetails event={event} />}
+      </Route>
       <Route path={`${match.path}/availability`}>
         {userAvail && (userAvail.availability ? (
           <Availability
@@ -50,6 +56,9 @@ const Event = (props) => {
             userId={user.id}
           />
         ))}
+      </Route>
+      <Route path={`${match.path}/update`}>
+        <UpdateEvent user={user} />
       </Route>
     </Switch>
   );

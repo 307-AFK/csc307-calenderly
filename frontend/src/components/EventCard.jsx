@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Row, Space } from 'antd';
 
@@ -13,10 +14,10 @@ const EventCard = (props) => {
     <Card width={24}>
       <Row justify='space-between' align='middle'>
         <Space>
-          <p>
+          <Link to={linkBase}>
             {event.title}
             {event.description && ` -  ${event.description}`}
-          </p>
+          </Link>
         </Space>
 
         <Space>

@@ -15,7 +15,7 @@ module.exports.getEvent = async (req, res) => {
   if (mongoose.Types.ObjectId.isValid(req.params.eventid)) {
     const e = await Event.findById(req.params.eventid);
     if (e) {
-      res.send(e);
+      res.json(e);
     } else {
       res.status(404).send('Event not found');
     }
