@@ -18,4 +18,7 @@ router.post('/:eventid/interviewees', events.addInterviewee);
 router.delete('/:eventid/interviewers', events.deleteInterviewer);
 router.delete('/:eventid/interviewees', events.deleteInterviewee);
 
+// interviewer sign ups
+router.post('/:eventid/:viewid/interview', events.interviewViewee);
+
 module.exports = router;

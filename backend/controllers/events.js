@@ -15,7 +15,7 @@ module.exports.getEvent = async (req, res) => {
   if (mongoose.Types.ObjectId.isValid(req.params.eventid)) {
     const e = await Event
       .findById(req.params.eventid)
-      .populate('interviewees.userId');
+      .populate('interviewees.userId interviewees.interviewers');
 
     if (e) {
       res.json(e);
@@ -301,4 +301,27 @@ module.exports.updateEvent = async (req, res) => {
       res.status(404).send('Event not found');
     }
   }
+};
+
+module.exports.interviewViewee = async (req, res) => {
+  const { eventid, viewid } = req.params;
+  const { viewerid } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(eventid)) {
+    res.status(404).send('Invalid event id');
+    return;
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(viewid)
+    || !mongoose.Types.ObjectId.isValid(viewerid)) {
+    res.status(404).send('Event not found');
+    return;
+  }
+
+  // TODO make sure only viewers can interview
+  const e = await Event.findOneAndUpdate({
+    _id: eventid, interviewees: { $elemMatch: { _id: viewid } },
+  }, { $push: { 'interviewees.$.interviewers': viewerid } });
+
+  res.send(e);
 };

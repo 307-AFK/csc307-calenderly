@@ -41,7 +41,7 @@ const Event = (props) => {
   return (
     <Switch>
       <Route path={`${match.path}/`} exact>
-        {event && <EventDetails event={event} userId={user.id} />}
+        {event && <EventDetails event={event} profile={user} />}
       </Route>
       <Route path={`${match.path}/availability`}>
         {userAvail && (userAvail.availability ? (
