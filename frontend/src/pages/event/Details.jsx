@@ -75,14 +75,13 @@ const Details = (props) => {
   const isViewer = findViewer !== undefined;
   const vieweeCount = event.interviewees.length;
 
-  console.log(event);
   return (
     <>
       <PageHeader title={event.title} />
 
       <div className='content'>
-        <p>{event.description}</p>
         <p>{`${startdate} → ${enddate}`}</p>
+        <p>{event.description}</p>
 
         <Divider />
         <h2>Interviewees</h2>
