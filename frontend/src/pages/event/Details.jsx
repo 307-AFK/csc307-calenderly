@@ -6,6 +6,9 @@ import {
   Tooltip,
   PageHeader,
   Divider,
+  Row,
+  Col,
+  Button,
 } from 'antd';
 
 import UserCard from '../../components/UserCard';
@@ -21,34 +24,56 @@ const splitEE = ([hd, ...tl], signed = [], unsigned = []) => {
 };
 
 const VieweeTile = (props) => {
-  const { datetime, user } = props;
+  const { datetime, user, isViewer } = props;
   const [day, time] = datetime.split('T00:');
   const timeString = time.substring(0, 5);
 
+  if (!isViewer) {
+    return (
+      <Col span={24}>
+        <UserCard picture={user.picture} name={user.name}>
+          <span>{`${user.name}: `}</span>
+          <b>{`${day} @ ${timeString}`}</b>
+        </UserCard>
+      </Col>
+    );
+  }
+
   return (
-    <UserCard picture={user.picture} name={user.name}>
-      <span>{`${user.name}: `}</span>
-      <b>{`${day} @ ${timeString}`}</b>
-    </UserCard>
+    <>
+      <Col span={21}>
+        <UserCard picture={user.picture} name={user.name}>
+          <span>{`${user.name}: `}</span>
+          <b>{`${day} @ ${timeString}`}</b>
+        </UserCard>
+      </Col>
+
+      <Col span={3}>
+        <Button block>Interview</Button>
+      </Col>
+    </>
   );
 };
 
 // TODO group by day
-const VieweePanel = ({ viewees }) => {
+const VieweePanel = ({ viewees, isViewer }) => {
   const [assigned, unassigned] = splitEE(viewees);
   const sortedAssigned = assigned.sort((a, b) => a.timeChosen > b.timeChosen);
 
   return (
     <>
       <h3>Interviewees Signed Up</h3>
-      { sortedAssigned.length > 0
-        ? sortedAssigned.map((user) => (
-          <VieweeTile
-            key={user._id}
-            user={user.userId}
-            datetime={user.timeChosen}
-          />
-        )) : <em>No interviewees have signed up yet</em>}
+      <Row>
+        { sortedAssigned.length > 0
+          ? sortedAssigned.map((user) => (
+            <VieweeTile
+              key={user._id}
+              user={user.userId}
+              datetime={user.timeChosen}
+              isViewer={isViewer}
+            />
+          )) : <em>No interviewees have signed up yet</em>}
+      </Row>
 
       <Divider />
       <h3>Interviewees Not Signed Up</h3>
@@ -99,6 +124,7 @@ VieweeTile.propTypes = {
     name: PropTypes.string.isRequired,
     picture: PropTypes.string.isRequired,
   }).isRequired,
+  isViewer: PropTypes.bool.isRequired,
 };
 
 VieweePanel.propTypes = {
@@ -109,6 +135,7 @@ VieweePanel.propTypes = {
       }),
     }),
   ).isRequired,
+  isViewer: PropTypes.bool.isRequired,
 };
 
 Details.propTypes = {
