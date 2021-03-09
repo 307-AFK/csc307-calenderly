@@ -25,13 +25,10 @@ const UpdateEvent = ({ user }) => {
   }
   return (
     <>
-      <h2>{eventInfo.title}</h2>
-      (eventId:
-      {id}
-      )
-      <br />
-      <h2>Description:</h2>
-      {eventInfo.description}
+      <h2>
+        Update&nbsp;
+        {eventInfo.title}
+      </h2>
       <EventDetails
         updateEventInfo={updateEventInfo}
         eventInfo={eventInfo}

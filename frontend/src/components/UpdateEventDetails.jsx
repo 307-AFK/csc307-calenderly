@@ -35,18 +35,12 @@ const EventDetails = (props) => {
   };
   return (
     <>
-      <h3>{eventInfo.title}</h3>
-      <h3>{eventInfo.startDate}</h3>
-      <h3>{eventInfo.endDate}</h3>
-      <h3>{eventInfo.description}</h3>
-      <h3>{eventInfo.interviewersNeeded}</h3>
-      <h3>{eventId}</h3>
       <Form onFinish={onFinish}>
         <Form.Item
           label='Event Title'
           name='title'
         >
-          <Input type='text' />
+          <Input type='text' placeholder={eventInfo.title} />
         </Form.Item>
         <Form.Item
           label='Start And End Dates'
@@ -55,19 +49,20 @@ const EventDetails = (props) => {
           <RangePicker
             showTime={{ format: 'HH:mm' }}
             format='YYYY-MM-DD HH:mm'
+            placeholder={[eventInfo.startDate, eventInfo.endDate]}
           />
         </Form.Item>
         <Form.Item
           label='Description'
           name='description'
         >
-          <Input type='text' />
+          <Input type='text' placeholder={eventInfo.description} />
         </Form.Item>
         <Form.Item
           label='Interviewers Needed'
           name='interviewersNeeded'
         >
-          <Input type='number' />
+          <Input type='number' placeholder={eventInfo.interviewersNeeded} />
         </Form.Item>
         <Form.Item>
           <Button type='primary' htmlType='submit'>
