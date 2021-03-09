@@ -13,7 +13,7 @@ const Interviewees = ({ users, updateEventInfo }) => (
     {
       users.map((i) => (
         <Interviewee
-          key={i.userId}
+          key={i.userId._id}
           userId={i.userId}
           updateEventInfo={updateEventInfo}
         />
@@ -44,7 +44,7 @@ const Interviewee = ({ userId, updateEventInfo }) => {
   };
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_SERVER_URL}/users/${userId}`,
+    fetch(`${process.env.REACT_APP_SERVER_URL}/users/${userId._id}`,
       { credentials: 'include' }).then((res) => res.json())
       .then((user) => {
         updateUserInfo(user);
@@ -102,13 +102,19 @@ const AddIntervieweeForm = ({ updateEventInfo }) => {
 
 Interviewees.propTypes = {
   users: PropTypes.arrayOf(
-    PropTypes.shape({ userId: PropTypes.string }),
+    PropTypes.shape({
+      userId: PropTypes.shape({
+        _id: PropTypes.string.isRequired,
+      }).isRequired,
+    }),
   ).isRequired,
   updateEventInfo: PropTypes.func.isRequired,
 };
 
 Interviewee.propTypes = {
-  userId: PropTypes.string.isRequired,
+  userId: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+  }).isRequired,
   updateEventInfo: PropTypes.func.isRequired,
 };
 
