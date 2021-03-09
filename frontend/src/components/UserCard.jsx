@@ -1,27 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
+import { Avatar } from 'antd';
 import styles from '../styles/UserCard.module.css';
 
-const UserCard = ({ picture, name }) => (
+const UserCard = ({ children, picture, name }) => (
   <div className={styles.userCard}>
-    <span className={styles.name}>{name}</span>
-    {' '}
-    {
-      picture
-      && (
-        <img
-          src={picture}
-          width="40px"
-          height="40px"
-          alt={`${name}'s avatar`}
-          className={styles.profPhoto}
-        />
-      )
-    }
+    <Avatar src={picture} alt={`${name}'s avatar`} />
+    <span className={styles.info}>{children}</span>
   </div>
 );
 
 UserCard.propTypes = {
+  children: PropTypes.node.isRequired,
   picture: PropTypes.string,
   name: PropTypes.string.isRequired,
 };

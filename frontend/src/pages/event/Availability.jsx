@@ -30,8 +30,7 @@ const Availability = (props) => {
       credentials: 'include',
       body: JSON.stringify({ avail, availId }),
     })
-      .then((res) => res.json())
-      .then(() => setUnsaved(false));
+      .then((res) => (res.status === 201 ? setUnsaved(false) : null));
   };
 
   return (
@@ -43,10 +42,7 @@ const Availability = (props) => {
       <Row>
         <Col offset={2} span={20}>
           <Calendar times={avail} toggled={updateAvailability} />
-          <Button
-            type={unsaved ? 'primary' : 'default'}
-            onClick={saveAvailability}
-          >
+          <Button onClick={saveAvailability} type='primary' disabled={!unsaved}>
             Save
           </Button>
         </Col>
