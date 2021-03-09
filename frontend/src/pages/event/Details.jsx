@@ -12,7 +12,9 @@ import {
 } from 'antd';
 
 import UserCard from '../../components/UserCard';
+import styles from '../../styles/EventDetails.module.css';
 
+// divides Viewees between scheduled and not scheduled
 const splitEE = ([hd, ...tl], signed = [], unsigned = []) => {
   if (hd === undefined) return [signed, unsigned];
   if (hd.timeChosen) {
@@ -23,54 +25,94 @@ const splitEE = ([hd, ...tl], signed = [], unsigned = []) => {
   return splitEE(tl, signed, unsigned);
 };
 
+// partitions scheduled by day
+const partByDay = (scheduled) => {
+  const days = {};
+
+  scheduled.forEach((e) => {
+    const day = e.timeChosen.substr(0, 10);
+    if (days[day] === undefined) days[day] = [];
+    days[day].push(e);
+  });
+
+  const dayPairs = Object.keys(days).map((k) => ({ date: k, views: days[k] }));
+  const sortedDays = dayPairs.sort((a, b) => a.date > b.date);
+
+  return sortedDays;
+};
+
 const VieweeTile = (props) => {
-  const { datetime, user, isViewer } = props;
-  const [day, time] = datetime.split('T00:');
+  const { datetime, user, viewer } = props;
+  const time = datetime.split('T00:')[1];
   const timeString = time.substring(0, 5);
 
-  if (!isViewer) {
+  console.log(viewer);
+
+  if (!viewer) {
     return (
       <Col span={24}>
         <UserCard picture={user.picture} name={user.name}>
-          <span>{`${user.name}: `}</span>
-          <b>{`${day} @ ${timeString}`}</b>
+          <span>{`${user.name} - `}</span>
+          <b>{timeString}</b>
         </UserCard>
       </Col>
     );
   }
 
+  const timeIndex = +(time.split(':')[0]) - 9;
+  const isAvail = viewer[0].times[timeIndex];
+  console.log(timeIndex);
+
   return (
     <>
       <Col span={21}>
         <UserCard picture={user.picture} name={user.name}>
-          <span>{`${user.name}: `}</span>
-          <b>{`${day} @ ${timeString}`}</b>
+          <span>{`${user.name} - `}</span>
+          <b>{timeString}</b>
         </UserCard>
       </Col>
 
       <Col span={3}>
-        <Button block>Interview</Button>
+        <Button block disabled={!isAvail} type='primary'>Interview</Button>
       </Col>
     </>
   );
 };
 
-// TODO group by day
-const VieweePanel = ({ viewees, isViewer }) => {
+const ViewDay = ({ day, views, viewer }) => (
+  <>
+    <Col span={24}>
+      <h4 className={styles.dayHeading}>{day}</h4>
+    </Col>
+    {
+      views.map((user) => (
+        <VieweeTile
+          key={user._id}
+          user={user.userId}
+          datetime={user.timeChosen}
+          viewer={viewer}
+        />
+      ))
+    }
+  </>
+);
+
+const VieweePanel = ({ viewees, viewerAvail }) => {
   const [assigned, unassigned] = splitEE(viewees);
-  const sortedAssigned = assigned.sort((a, b) => a.timeChosen > b.timeChosen);
+  const days = partByDay(assigned);
 
   return (
     <>
       <h3>Interviewees Signed Up</h3>
       <Row>
-        { sortedAssigned.length > 0
-          ? sortedAssigned.map((user) => (
-            <VieweeTile
-              key={user._id}
-              user={user.userId}
-              datetime={user.timeChosen}
-              isViewer={isViewer}
+        { assigned.length > 0
+          ? days.map((day) => (
+            <ViewDay
+              day={day.date}
+              views={day.views}
+              viewer={viewerAvail && viewerAvail.filter((d) => (
+                d.date.substr(0, 10) === day.date
+              ))}
             />
           )) : <em>No interviewees have signed up yet</em>}
       </Row>
@@ -97,7 +139,7 @@ const Details = (props) => {
   const enddate = event.startDate.substr(0, 10);
 
   const findViewer = event.interviewers.find((u) => u.userId === userId);
-  const isViewer = findViewer !== undefined;
+  const viewerAvail = findViewer ? findViewer.availability : null;
   const vieweeCount = event.interviewees.length;
 
   return (
@@ -111,11 +153,29 @@ const Details = (props) => {
         <Divider />
         <h2>Interviewees</h2>
         {vieweeCount > 0
-          ? <VieweePanel viewees={event.interviewees} isViewer={isViewer} />
-          : <em>There are currently no interviewees</em>}
+          ? (
+            <VieweePanel
+              viewees={event.interviewees}
+              viewerAvail={viewerAvail}
+            />
+          ) : <em>There are currently no interviewees</em>}
       </div>
     </>
   );
+};
+
+ViewDay.propTypes = {
+  day: PropTypes.string.isRequired,
+  views: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      picture: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
+  viewer: PropTypes.arrayOf({
+    date: PropTypes.string.isRequired,
+    times: PropTypes.arrayOf(PropTypes.bool).isRequired,
+  }).isRequired,
 };
 
 VieweeTile.propTypes = {
@@ -124,7 +184,12 @@ VieweeTile.propTypes = {
     name: PropTypes.string.isRequired,
     picture: PropTypes.string.isRequired,
   }).isRequired,
-  isViewer: PropTypes.bool.isRequired,
+  viewer: PropTypes.arrayOf(
+    PropTypes.shape({
+      date: PropTypes.string.isRequired,
+      times: PropTypes.arrayOf(PropTypes.bool).isRequired,
+    }),
+  ).isRequired,
 };
 
 VieweePanel.propTypes = {
@@ -135,7 +200,12 @@ VieweePanel.propTypes = {
       }),
     }),
   ).isRequired,
-  isViewer: PropTypes.bool.isRequired,
+  viewerAvail: PropTypes.arrayOf(
+    PropTypes.shape({
+      date: PropTypes.string.isRequired,
+      times: PropTypes.arrayOf(PropTypes.bool).isRequired,
+    }),
+  ).isRequired,
 };
 
 Details.propTypes = {
