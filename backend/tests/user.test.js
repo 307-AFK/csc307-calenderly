@@ -25,7 +25,7 @@ const eventData = {
 describe('Test user endpoints', () => {
   let testUser;
   beforeAll(async () => {
-    await mongoose.connect(process.env.DATABASE_URL, {
+    await mongoose.connect(process.env.TEST_DATABASE_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: false,
@@ -101,18 +101,21 @@ describe('Test user endpoints', () => {
       name: 'new user',
       email: 'new.user1@gmail.com',
     }).save();
-    const postMessage = (await request.post(`/events/${eventAsInterviewer._id}/interviewers`).send({ email: newUser.email })).body.message;
+    const postMessage = (await request.post(`/events/${eventAsInterviewer._id}/interviewers`)
+      .send({ email: newUser.email })).body.message;
     expect(postMessage).toBe('1 user(s) added successfully');
-    const postMessage2 = (await request.post(`/events/${eventAsInterviewee._id}/interviewees`).send({ email: newUser.email })).body.message;
+    const postMessage2 = (await request.post(`/events/${eventAsInterviewee._id}/interviewees`)
+      .send({ email: newUser.email })).body.message;
     expect(postMessage2).toBe('1 user(s) added successfully');
 
     // make sure newUser's list of events is correct
     // get latest
-    const usersEventsAsInterviewee = (await request.get(`/users/${newUser._id}/events/interviewee`)).body;
-    const usersEventsAsInterviewer = (await request.get(`/users/${newUser._id}/events/interviewer`)).body;
+    // note: .map extracts event info from eventId (which was populated in the backend)
+    const usersEventsAsInterviewee = (await request.get(`/users/${newUser._id}/events/interviewee`)).body.map((e) => e.eventId);
+    const usersEventsAsInterviewer = (await request.get(`/users/${newUser._id}/events/interviewer`)).body.map((e) => e.eventId);
     // check
-    expect(usersEventsAsInterviewee.some((e) => e.eventId === eventAsInterviewee._id)).toBe(true);
-    expect(usersEventsAsInterviewer.some((e) => e.eventId === eventAsInterviewer._id)).toBe(true);
+    expect(usersEventsAsInterviewee.some((e) => e._id === eventAsInterviewee._id)).toBe(true);
+    expect(usersEventsAsInterviewer.some((e) => e._id === eventAsInterviewer._id)).toBe(true);
 
     // delete newUser
     const res = await request.delete(`/users/${newUser._id}`);
