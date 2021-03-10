@@ -8,7 +8,7 @@ import style from '../styles/UpdateEventPage.module.css';
 
 const UpdateEvent = ({ user }) => {
   const { id } = useParams();
-
+  let userIdArr;
   const [eventInfo, updateEventInfo] = useState({});
   const eventLink = `${process.env.REACT_APP_SERVER_URL}/events/${id}`;
 
@@ -24,7 +24,13 @@ const UpdateEvent = ({ user }) => {
     || !eventInfo.interviewers.some((u) => u.userId === user.id)) {
     return <div>You do not have permission to edit this event</div>;
   }
-  return (
+  // get array of user ids, but have to check if userIds has been populated. . .
+  if (eventInfo.interviewees[0] && eventInfo.interviewees[0].userId._id) {
+    userIdArr = eventInfo.interviewees.map((i) => i.userId._id);
+  } else {
+    userIdArr = eventInfo.interviewees.map((i) => i.userId);
+  }
+  return userIdArr && (
     <div className={style.page}>
       <EventDetails
         updateEventInfo={updateEventInfo}
@@ -39,7 +45,7 @@ const UpdateEvent = ({ user }) => {
       />
 
       <Interviewees
-        users={eventInfo.interviewees}
+        userIds={userIdArr}
         updateEventInfo={updateEventInfo}
       />
     </div>

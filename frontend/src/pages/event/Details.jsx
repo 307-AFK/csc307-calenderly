@@ -381,9 +381,7 @@ Details.propTypes = {
     ),
     interviewers: PropTypes.arrayOf(
       PropTypes.shape({
-        userId: PropTypes.shape({
-          _id: PropTypes.string.isRequired,
-        }),
+        userId: PropTypes.string.isRequired,
       }),
     ),
   }).isRequired,

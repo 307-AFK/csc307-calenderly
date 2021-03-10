@@ -8,14 +8,14 @@ import {
 } from '@ant-design/icons';
 import style from '../styles/AddInterviewee.module.css';
 
-const Interviewees = ({ users, updateEventInfo }) => (
+const Interviewees = ({ userIds, updateEventInfo }) => (
   <>
     <h3 className={style.head}>Current Interviewees:</h3>
     {
-      users.map((i) => (
+      userIds.map((id) => (
         <Interviewee
-          key={i.userId._id}
-          userId={i.userId}
+          key={id}
+          userId={id}
           updateEventInfo={updateEventInfo}
         />
       ))
@@ -45,7 +45,7 @@ const Interviewee = ({ userId, updateEventInfo }) => {
   };
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_SERVER_URL}/users/${userId._id}`,
+    fetch(`${process.env.REACT_APP_SERVER_URL}/users/${userId}`,
       { credentials: 'include' }).then((res) => res.json())
       .then((user) => {
         updateUserInfo(user);
@@ -103,20 +103,12 @@ const AddIntervieweeForm = ({ updateEventInfo }) => {
 };
 
 Interviewees.propTypes = {
-  users: PropTypes.arrayOf(
-    PropTypes.shape({
-      userId: PropTypes.shape({
-        _id: PropTypes.string.isRequired,
-      }).isRequired,
-    }),
-  ).isRequired,
+  userIds: PropTypes.arrayOf(PropTypes.string).isRequired,
   updateEventInfo: PropTypes.func.isRequired,
 };
 
 Interviewee.propTypes = {
-  userId: PropTypes.shape({
-    _id: PropTypes.string.isRequired,
-  }).isRequired,
+  userId: PropTypes.string.isRequired,
   updateEventInfo: PropTypes.func.isRequired,
 };
 
