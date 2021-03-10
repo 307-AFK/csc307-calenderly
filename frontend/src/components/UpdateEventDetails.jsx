@@ -6,6 +6,7 @@ import {
   Input,
   DatePicker,
 } from 'antd';
+import style from '../styles/UpdateEventDetails.module.css';
 
 const { RangePicker } = DatePicker;
 
@@ -36,13 +37,21 @@ const EventDetails = (props) => {
   return (
     <>
       <Form onFinish={onFinish}>
+        <h1 className={style.title}>
+          Update&nbsp;
+          {eventInfo.title}
+        </h1>
         <Form.Item
+          className={style.titleEntry}
+          labelCol={{ span: 24 }}
           label='Event Title'
           name='title'
         >
           <Input type='text' placeholder={eventInfo.title} />
         </Form.Item>
         <Form.Item
+          className={style.dateRange}
+          labelCol={{ span: 24 }}
           label='Start And End Dates'
           name='daterange'
         >
@@ -53,19 +62,23 @@ const EventDetails = (props) => {
           />
         </Form.Item>
         <Form.Item
+          className={style.description}
+          labelCol={{ span: 24 }}
           label='Description'
           name='description'
         >
-          <Input type='text' placeholder={eventInfo.description} />
+          <Input.TextArea placeholder={eventInfo.description} />
         </Form.Item>
         <Form.Item
+          className={style.interviewersNeeded}
+          labelCol={{ span: 24 }}
           label='Interviewers Needed'
           name='interviewersNeeded'
         >
           <Input type='number' placeholder={eventInfo.interviewersNeeded} />
         </Form.Item>
-        <Form.Item>
-          <Button type='primary' htmlType='submit'>
+        <Form.Item className={style.submit}>
+          <Button className={style.but} type='primary' htmlType='submit'>
             Update Event
           </Button>
         </Form.Item>

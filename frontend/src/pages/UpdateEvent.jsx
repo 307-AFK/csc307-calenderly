@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Interviewers from '../components/Interviewers';
 import Interviewees from '../components/Interviewees';
 import EventDetails from '../components/UpdateEventDetails';
+import style from '../styles/UpdateEventPage.module.css';
 
 const UpdateEvent = ({ user }) => {
   const { id } = useParams();
@@ -24,11 +25,7 @@ const UpdateEvent = ({ user }) => {
     return <div>You do not have permission to edit this event</div>;
   }
   return (
-    <>
-      <h2>
-        Update&nbsp;
-        {eventInfo.title}
-      </h2>
+    <div className={style.page}>
       <EventDetails
         updateEventInfo={updateEventInfo}
         eventInfo={eventInfo}
@@ -45,7 +42,7 @@ const UpdateEvent = ({ user }) => {
         users={eventInfo.interviewees}
         updateEventInfo={updateEventInfo}
       />
-    </>
+    </div>
   );
 };
 
