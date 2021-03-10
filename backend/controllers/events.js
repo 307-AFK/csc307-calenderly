@@ -325,3 +325,26 @@ module.exports.interviewViewee = async (req, res) => {
 
   res.send(e);
 };
+
+module.exports.interviewVieweeRemove = async (req, res) => {
+  const { eventid, viewid } = req.params;
+  const { viewerid } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(eventid)) {
+    res.status(404).send('Invalid event id');
+    return;
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(viewid)
+    || !mongoose.Types.ObjectId.isValid(viewerid)) {
+    res.status(404).send('Event not found');
+    return;
+  }
+
+  // TODO make sure only viewers can interview
+  const e = await Event.findOneAndUpdate({
+    _id: eventid, interviewees: { $elemMatch: { _id: viewid } },
+  }, { $pull: { 'interviewees.$.interviewers': viewerid } });
+
+  res.send(e);
+};

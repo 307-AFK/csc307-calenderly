@@ -20,5 +20,6 @@ router.delete('/:eventid/interviewees', events.deleteInterviewee);
 
 // interviewer sign ups
 router.post('/:eventid/:viewid/interview', events.interviewViewee);
+router.delete('/:eventid/:viewid/interview', events.interviewVieweeRemove);
 
 module.exports = router;

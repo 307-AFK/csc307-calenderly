@@ -43,6 +43,9 @@ const partByDay = (scheduled) => {
 
 const InterviewButton = ({ isAvail, viewerList, info }) => {
   const [viewers, setViewers] = useState(viewerList);
+  const [viewing, setViewing] = useState(
+    viewerList.filter((v) => (v._id === info.profile.id)).length > 0,
+  );
   const baseURL = `${process.env.REACT_APP_SERVER_URL}/events`;
 
   const addViewer = () => {
@@ -59,8 +62,23 @@ const InterviewButton = ({ isAvail, viewerList, info }) => {
       };
 
       setViewers([...viewers, prof]);
+      setViewing(!viewing);
     });
   };
+
+  const removeViewer = () => {
+    fetch(`${baseURL}/${info.eventId}/${info.viewId}/interview`, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ viewerid: info.profile.id }),
+    }).then(() => {
+      setViewers(viewers.filter((v) => v._id !== info.profile.id));
+      setViewing(!viewing);
+    });
+  };
+
+  const btnType = isAvail ? 'primary' : 'dashed';
 
   return (
     <>
@@ -74,14 +92,16 @@ const InterviewButton = ({ isAvail, viewerList, info }) => {
         </Avatar.Group>
       </Col>
       <Col span={3}>
-        <Button
-          block
-          disabled={!isAvail}
-          type='primary'
-          onClick={addViewer}
-        >
-          Interview
-        </Button>
+        {!viewing && (
+          <Button block type={btnType} onClick={addViewer}>
+            Interview
+          </Button>
+        )}
+        {viewing && (
+          <Button block danger onClick={removeViewer}>
+            Unassign
+          </Button>
+        )}
       </Col>
     </>
   );
