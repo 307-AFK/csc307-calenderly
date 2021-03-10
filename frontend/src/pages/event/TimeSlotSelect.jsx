@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+
 import {
   PageHeader, Form, Radio, Typography, Button,
 } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
+import style from '../../styles/TimeSlots.module.css';
 
 const { Title } = Typography;
 
@@ -12,26 +14,29 @@ const TimeSlotSelect = ({ event, userId }) => {
   const [form] = useForm();
   const [otherInterviewees, setOtherInterviewees] = useState([]);
 
+  const linkBase = `${process.env.REACT_APP_SERVER_URL}/events/${event._id}`;
+
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${event._id}/timeslots`,
-      { credentials: 'include' })
+    fetch(`${linkBase}/timeslots`, { credentials: 'include' })
       .then((res) => res.json())
       .then((ts) => setTimeSlots(ts));
-    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${event._id}/interviewees`,
-      { credentials: 'include' })
+
+    fetch(`${linkBase}/interviewees`, { credentials: 'include' })
       .then((res) => res.json())
       .then((ivs) => setOtherInterviewees(ivs.filter((i) => i.userId !== userId)));
-    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${event._id}/interviewees`,
-      { credentials: 'include' })
+
+    fetch(`${linkBase}/interviewees`, { credentials: 'include' })
       .then((res) => res.json())
       .then((interviewers) => {
-        form.setFieldsValue({ timeSlot: interviewers.find((i) => i.userId === userId).timeChosen });
+        form.setFieldsValue({
+          timeSlot: interviewers.find((i) => i.userId === userId).timeChosen,
+        });
       });
   }, []);
 
   const onFinish = ({ timeSlot }) => {
     const timeChosen = new Date(timeSlot);
-    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${event._id}/timeslot`, {
+    fetch(`${linkBase}/timeslot`, {
       method: 'POST', // TODO: change to PUT request
       headers: {
         'Content-Type': 'application/json',
@@ -94,7 +99,13 @@ const Time = ({ day, otherInterviewees }) => {
           // don't display timeslots that have already been selected by another interviewee
           if (!otherInterviewees.find((intv) => intv.timeChosen === timeslot)) {
             return (t && (
-              <Radio value={timeslot} key={hours[i].time}>{`${hours[i].time} - ${hours[i + 1].time}`}</Radio>
+              <Radio
+                value={timeslot}
+                key={hours[i].time}
+                className={style.radioBlock}
+              >
+                {`${hours[i].time} - ${hours[i + 1].time}`}
+              </Radio>
             ));
           }
           return false;

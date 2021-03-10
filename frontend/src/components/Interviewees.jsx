@@ -13,7 +13,7 @@ const Interviewees = ({ users, updateEventInfo }) => (
     {
       users.map((i) => (
         <Interviewee
-          key={i.userId}
+          key={i.userId._id}
           userId={i.userId}
           updateEventInfo={updateEventInfo}
         />
@@ -26,10 +26,10 @@ const Interviewees = ({ users, updateEventInfo }) => (
 const Interviewee = ({ userId, updateEventInfo }) => {
   const [userInfo, updateUserInfo] = useState({});
 
-  const { eventId } = useParams();
+  const { id } = useParams();
 
   const removeUser = () => {
-    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${eventId}/interviewees`,
+    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${id}/interviewees`,
       {
         method: 'DELETE',
         credentials: 'include',
@@ -44,7 +44,7 @@ const Interviewee = ({ userId, updateEventInfo }) => {
   };
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_SERVER_URL}/users/${userId}`,
+    fetch(`${process.env.REACT_APP_SERVER_URL}/users/${userId._id}`,
       { credentials: 'include' }).then((res) => res.json())
       .then((user) => {
         updateUserInfo(user);
@@ -63,12 +63,12 @@ const Interviewee = ({ userId, updateEventInfo }) => {
 };
 
 const AddIntervieweeForm = ({ updateEventInfo }) => {
-  const { eventId } = useParams();
+  const { id } = useParams();
 
   const [form] = Form.useForm();
 
   const onFinish = (values) => {
-    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${eventId}/interviewees`,
+    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${id}/interviewees`,
       {
         method: 'POST',
         credentials: 'include',
@@ -102,13 +102,19 @@ const AddIntervieweeForm = ({ updateEventInfo }) => {
 
 Interviewees.propTypes = {
   users: PropTypes.arrayOf(
-    PropTypes.shape({ userId: PropTypes.string }),
+    PropTypes.shape({
+      userId: PropTypes.shape({
+        _id: PropTypes.string.isRequired,
+      }).isRequired,
+    }),
   ).isRequired,
   updateEventInfo: PropTypes.func.isRequired,
 };
 
 Interviewee.propTypes = {
-  userId: PropTypes.string.isRequired,
+  userId: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+  }).isRequired,
   updateEventInfo: PropTypes.func.isRequired,
 };
 

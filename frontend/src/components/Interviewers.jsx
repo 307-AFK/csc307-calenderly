@@ -27,10 +27,10 @@ const Interviewers = ({ currUserId, users, updateEventInfo }) => (
 const Interviewer = ({ currUserId, userId, updateEventInfo }) => {
   const [userInfo, updateUserInfo] = useState({});
 
-  const { eventId } = useParams();
+  const { id } = useParams();
 
   const removeUser = () => {
-    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${eventId}/interviewers`,
+    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${id}/interviewers`,
       {
         method: 'DELETE',
         credentials: 'include',
@@ -74,12 +74,12 @@ const Interviewer = ({ currUserId, userId, updateEventInfo }) => {
 };
 
 const AddInterviewerForm = ({ updateEventInfo }) => {
-  const { eventId } = useParams();
+  const { id } = useParams();
 
   const [form] = Form.useForm();
 
   const onFinish = (values) => {
-    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${eventId}/interviewers`,
+    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${id}/interviewers`,
       {
         method: 'POST',
         credentials: 'include',

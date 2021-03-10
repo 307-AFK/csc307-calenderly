@@ -1,12 +1,7 @@
 .userCard {
-  display: flex;
-  align-items: center;
+  margin-bottom: 8px;
 }
 
-.name {
-  padding-right: 5px;
-}
-
-.profPhoto {
-  border-radius: 50%;
+.info {
+  margin-left: 4px;
 }

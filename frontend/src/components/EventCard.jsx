@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Row, Space } from 'antd';
 
@@ -13,10 +14,12 @@ const EventCard = (props) => {
     <Card width={24}>
       <Row justify='space-between' align='middle'>
         <Space>
-          <p>
-            {event.title}
-            {event.description && ` -  ${event.description}`}
-          </p>
+          <Link to={linkBase}>
+            <u>
+              {event.title}
+              {event.description && ` -  ${event.description}`}
+            </u>
+          </Link>
         </Space>
 
         <Space>
@@ -27,12 +30,11 @@ const EventCard = (props) => {
                 Set Availability
               </ButtonLink>
             </>
-          )
-            : (
-              <ButtonLink link={`${linkBase}/availability`}>
-                Select Timeslot
-              </ButtonLink>
-            )}
+          ) : (
+            <ButtonLink link={`${linkBase}/availability`}>
+              Select Timeslot
+            </ButtonLink>
+          )}
         </Space>
       </Row>
     </Card>
