@@ -11,6 +11,7 @@ import {
   Button,
 } from 'antd';
 
+import ButtonLink from '../../components/ButtonLink';
 import UserCard from '../../components/UserCard';
 import styles from '../../styles/EventDetails.module.css';
 
@@ -242,7 +243,10 @@ const Details = (props) => {
       <PageHeader title={event.title} />
 
       <div className='content'>
-        <p>{`${startdate} → ${enddate}`}</p>
+        <Row align='space-between'>
+          <p>{`${startdate} → ${enddate}`}</p>
+          <ButtonLink link={`${event._id}/update`}>Update Event</ButtonLink>
+        </Row>
         <p>{event.description}</p>
 
         <Divider />
