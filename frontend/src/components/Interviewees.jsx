@@ -6,10 +6,11 @@ import { Button, Form, Input } from 'antd';
 import {
   MinusSquareOutlined,
 } from '@ant-design/icons';
+import style from '../styles/AddInterviewee.module.css';
 
 const Interviewees = ({ users, updateEventInfo }) => (
   <>
-    <h2>Current Interviewees:</h2>
+    <h3 className={style.head}>Current Interviewees:</h3>
     {
       users.map((i) => (
         <Interviewee
@@ -87,13 +88,14 @@ const AddIntervieweeForm = ({ updateEventInfo }) => {
   return (
     <Form form={form} onFinish={onFinish} layout='inline'>
       <Form.Item
+        className={style.NewInterviewee}
         label='New Interviewee'
         name='email'
         rules={[{ type: 'email' }]}
       >
         <Input />
       </Form.Item>
-      <Button type='primary' htmlType='submit'>
+      <Button className={style.but} type='primary' htmlType='submit'>
         +
       </Button>
     </Form>

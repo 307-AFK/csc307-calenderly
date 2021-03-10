@@ -288,14 +288,23 @@ module.exports.updateEvent = async (req, res) => {
   if (mongoose.Types.ObjectId.isValid(req.params.eventid)) {
     const e = await Event.findById(req.params.eventid);
     if (e) {
-      console.log(e);
-      e.title = req.body.title;
-      e.description = req.body.description;
-      e.startDate = req.body.startDate;
-      e.endDate = req.body.endDate;
-      e.interviewersNeeded = req.body.interviewersNeeded;
+      if (req.body.title) {
+        e.title = req.body.title;
+      }
+      if (req.body.description) {
+        e.description = req.body.description;
+      }
+      if (req.body.startDate) {
+        e.startDate = req.body.startDate;
+      }
+      if (req.body.endDate) {
+        e.endDate = req.body.endDate;
+      }
+      if (req.body.interviewersNeeded) {
+        e.interviewersNeeded = req.body.interviewersNeeded;
+      }
       e.save().then(() => {
-        res.status(204).send({ message: 'Event updated', event: e });
+        res.status(200).send({ message: 'Event updated', event: e });
       });
     } else {
       res.status(404).send('Event not found');
