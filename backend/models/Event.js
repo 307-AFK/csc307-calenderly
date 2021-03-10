@@ -19,6 +19,10 @@ const intervieweeSchema = new mongoose.Schema({
     ref: 'User',
   },
   timeChosen: Date,
+  interviewers: [{
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  }],
 });
 
 const eventSchema = new mongoose.Schema({

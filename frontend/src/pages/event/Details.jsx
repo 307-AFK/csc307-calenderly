@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import {
@@ -11,6 +11,7 @@ import {
   Button,
 } from 'antd';
 
+import ButtonLink from '../../components/ButtonLink';
 import UserCard from '../../components/UserCard';
 import styles from '../../styles/EventDetails.module.css';
 
@@ -41,12 +42,85 @@ const partByDay = (scheduled) => {
   return sortedDays;
 };
 
+const InterviewButton = ({ isAvail, viewerList, info }) => {
+  const [viewers, setViewers] = useState(viewerList);
+  const [viewing, setViewing] = useState(
+    viewerList.filter((v) => (v._id === info.profile.id)).length > 0,
+  );
+  const baseURL = `${process.env.REACT_APP_SERVER_URL}/events`;
+
+  const addViewer = () => {
+    fetch(`${baseURL}/${info.eventId}/${info.viewId}/interview`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ viewerid: info.profile.id }),
+    }).then(() => {
+      const prof = {
+        _id: info.profile.id,
+        name: info.profile.name,
+        picture: info.profile.picture,
+      };
+
+      setViewers([...viewers, prof]);
+      setViewing(!viewing);
+    });
+  };
+
+  const removeViewer = () => {
+    fetch(`${baseURL}/${info.eventId}/${info.viewId}/interview`, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ viewerid: info.profile.id }),
+    }).then(() => {
+      setViewers(viewers.filter((v) => v._id !== info.profile.id));
+      setViewing(!viewing);
+    });
+  };
+
+  const btnType = isAvail ? 'primary' : 'dashed';
+
+  return (
+    <>
+      <Col span={4}>
+        <Avatar.Group>
+          {viewers && viewers.map((v) => (
+            <Tooltip key={v._id} title={v.name} placement='bottom'>
+              <Avatar src={v.picture} />
+            </Tooltip>
+          ))}
+        </Avatar.Group>
+      </Col>
+      <Col span={3}>
+        {!viewing && (
+          <Button block type={btnType} onClick={addViewer}>
+            Interview
+          </Button>
+        )}
+        {viewing && (
+          <Button block danger onClick={removeViewer}>
+            Unassign
+          </Button>
+        )}
+      </Col>
+    </>
+  );
+};
+
 const VieweeTile = (props) => {
-  const { datetime, user, viewer } = props;
+  const {
+    eventId,
+    viewId,
+    profile,
+    datetime,
+    user,
+    viewer,
+    viewers,
+  } = props;
+
   const time = datetime.split('T00:')[1];
   const timeString = time.substring(0, 5);
-
-  console.log(viewer);
 
   if (!viewer) {
     return (
@@ -61,43 +135,62 @@ const VieweeTile = (props) => {
 
   const timeIndex = +(time.split(':')[0]) - 9;
   const isAvail = viewer[0].times[timeIndex];
-  console.log(timeIndex);
+  const btnInfo = { eventId, viewId, profile };
 
   return (
     <>
-      <Col span={21}>
+      <Col span={17}>
         <UserCard picture={user.picture} name={user.name}>
           <span>{`${user.name} - `}</span>
           <b>{timeString}</b>
         </UserCard>
       </Col>
 
-      <Col span={3}>
-        <Button block disabled={!isAvail} type='primary'>Interview</Button>
-      </Col>
+      <InterviewButton isAvail={isAvail} viewerList={viewers} info={btnInfo} />
     </>
   );
 };
 
-const ViewDay = ({ day, views, viewer }) => (
-  <>
-    <Col span={24}>
-      <h4 className={styles.dayHeading}>{day}</h4>
-    </Col>
-    {
-      views.map((user) => (
-        <VieweeTile
-          key={user._id}
-          user={user.userId}
-          datetime={user.timeChosen}
-          viewer={viewer}
-        />
-      ))
-    }
-  </>
-);
+const ViewDay = (props) => {
+  const {
+    eventId,
+    profile,
+    day,
+    views,
+    viewer,
+  } = props;
 
-const VieweePanel = ({ viewees, viewerAvail }) => {
+  return (
+    <>
+      <Col span={24}>
+        <h4 className={styles.dayHeading}>{day}</h4>
+      </Col>
+      { /* TODO surely this can be cleaned up */
+        views.map((user) => (
+          <VieweeTile
+            key={user._id}
+            eventId={eventId}
+            viewId={user._id}
+            profile={profile}
+            user={user.userId}
+            datetime={user.timeChosen}
+            viewer={viewer}
+            viewers={user.interviewers}
+          />
+        ))
+      }
+    </>
+  );
+};
+
+const VieweePanel = (props) => {
+  const {
+    eventId,
+    profile,
+    viewees,
+    viewerAvail,
+  } = props;
+
   const [assigned, unassigned] = splitEE(viewees);
   const days = partByDay(assigned);
 
@@ -108,6 +201,9 @@ const VieweePanel = ({ viewees, viewerAvail }) => {
         { assigned.length > 0
           ? days.map((day) => (
             <ViewDay
+              key={day.date}
+              eventId={eventId}
+              profile={profile}
               day={day.date}
               views={day.views}
               viewer={viewerAvail && viewerAvail.filter((d) => (
@@ -133,12 +229,12 @@ const VieweePanel = ({ viewees, viewerAvail }) => {
 };
 
 const Details = (props) => {
-  const { userId, event } = props;
+  const { profile, event } = props;
 
   const startdate = event.startDate.substr(0, 10);
   const enddate = event.startDate.substr(0, 10);
 
-  const findViewer = event.interviewers.find((u) => u.userId === userId);
+  const findViewer = event.interviewers.find((u) => u.userId === profile.id);
   const viewerAvail = findViewer ? findViewer.availability : null;
   const vieweeCount = event.interviewees.length;
 
@@ -147,7 +243,10 @@ const Details = (props) => {
       <PageHeader title={event.title} />
 
       <div className='content'>
-        <p>{`${startdate} → ${enddate}`}</p>
+        <Row align='space-between'>
+          <p>{`${startdate} → ${enddate}`}</p>
+          <ButtonLink link={`${event._id}/update`}>Update Event</ButtonLink>
+        </Row>
         <p>{event.description}</p>
 
         <Divider />
@@ -155,6 +254,8 @@ const Details = (props) => {
         {vieweeCount > 0
           ? (
             <VieweePanel
+              eventId={event._id}
+              profile={profile}
               viewees={event.interviewees}
               viewerAvail={viewerAvail}
             />
@@ -164,21 +265,33 @@ const Details = (props) => {
   );
 };
 
-ViewDay.propTypes = {
-  day: PropTypes.string.isRequired,
-  views: PropTypes.arrayOf(
+InterviewButton.propTypes = {
+  isAvail: PropTypes.bool.isRequired,
+  viewerList: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
       picture: PropTypes.string.isRequired,
-    }),
+    }).isRequired,
   ).isRequired,
-  viewer: PropTypes.arrayOf({
-    date: PropTypes.string.isRequired,
-    times: PropTypes.arrayOf(PropTypes.bool).isRequired,
+  info: PropTypes.shape({
+    eventId: PropTypes.string.isRequired,
+    viewId: PropTypes.string.isRequired,
+    profile: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      picture: PropTypes.string.isRequired,
+    }),
   }).isRequired,
 };
 
 VieweeTile.propTypes = {
+  eventId: PropTypes.string.isRequired,
+  viewId: PropTypes.string.isRequired,
+  profile: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    picture: PropTypes.string.isRequired,
+  }).isRequired,
   datetime: PropTypes.string.isRequired,
   user: PropTypes.shape({
     name: PropTypes.string.isRequired,
@@ -190,9 +303,43 @@ VieweeTile.propTypes = {
       times: PropTypes.arrayOf(PropTypes.bool).isRequired,
     }),
   ).isRequired,
+  viewers: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      picture: PropTypes.string.isRequired,
+    }).isRequired,
+  ).isRequired,
+};
+
+ViewDay.propTypes = {
+  eventId: PropTypes.string.isRequired,
+  profile: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    picture: PropTypes.string.isRequired,
+  }).isRequired,
+  day: PropTypes.string.isRequired,
+  views: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      picture: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
+  viewer: PropTypes.arrayOf(
+    PropTypes.shape({
+      date: PropTypes.string.isRequired,
+      times: PropTypes.arrayOf(PropTypes.bool).isRequired,
+    }),
+  ).isRequired,
 };
 
 VieweePanel.propTypes = {
+  eventId: PropTypes.string.isRequired,
+  profile: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    picture: PropTypes.string.isRequired,
+  }).isRequired,
   viewees: PropTypes.arrayOf(
     PropTypes.shape({
       userId: PropTypes.shape({
@@ -209,7 +356,11 @@ VieweePanel.propTypes = {
 };
 
 Details.propTypes = {
-  userId: PropTypes.string.isRequired,
+  profile: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    picture: PropTypes.string.isRequired,
+  }).isRequired,
   event: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
@@ -221,6 +372,11 @@ Details.propTypes = {
         userId: PropTypes.shape({
           _id: PropTypes.string.isRequired,
         }),
+        interviewers: PropTypes.arrayOf(
+          PropTypes.shape({
+            _id: PropTypes.string.isRequired,
+          }),
+        ),
       }),
     ),
     interviewers: PropTypes.arrayOf(
