@@ -6,15 +6,16 @@ import { Button, Form, Input } from 'antd';
 import {
   MinusSquareOutlined,
 } from '@ant-design/icons';
+import style from '../styles/AddInterviewee.module.css';
 
-const Interviewees = ({ users, updateEventInfo }) => (
+const Interviewees = ({ userIds, updateEventInfo }) => (
   <>
-    <h2>Current Interviewees:</h2>
+    <h3 className={style.head}>Current Interviewees:</h3>
     {
-      users.map((i) => (
+      userIds.map((id) => (
         <Interviewee
-          key={i.userId}
-          userId={i.userId}
+          key={id}
+          userId={id}
           updateEventInfo={updateEventInfo}
         />
       ))
@@ -26,10 +27,10 @@ const Interviewees = ({ users, updateEventInfo }) => (
 const Interviewee = ({ userId, updateEventInfo }) => {
   const [userInfo, updateUserInfo] = useState({});
 
-  const { eventId } = useParams();
+  const { id } = useParams();
 
   const removeUser = () => {
-    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${eventId}/interviewees`,
+    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${id}/interviewees`,
       {
         method: 'DELETE',
         credentials: 'include',
@@ -63,12 +64,12 @@ const Interviewee = ({ userId, updateEventInfo }) => {
 };
 
 const AddIntervieweeForm = ({ updateEventInfo }) => {
-  const { eventId } = useParams();
+  const { id } = useParams();
 
   const [form] = Form.useForm();
 
   const onFinish = (values) => {
-    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${eventId}/interviewees`,
+    fetch(`${process.env.REACT_APP_SERVER_URL}/events/${id}/interviewees`,
       {
         method: 'POST',
         credentials: 'include',
@@ -87,13 +88,14 @@ const AddIntervieweeForm = ({ updateEventInfo }) => {
   return (
     <Form form={form} onFinish={onFinish} layout='inline'>
       <Form.Item
+        className={style.NewInterviewee}
         label='New Interviewee'
         name='email'
         rules={[{ type: 'email' }]}
       >
         <Input />
       </Form.Item>
-      <Button type='primary' htmlType='submit'>
+      <Button className={style.but} type='primary' htmlType='submit'>
         +
       </Button>
     </Form>
@@ -101,9 +103,7 @@ const AddIntervieweeForm = ({ updateEventInfo }) => {
 };
 
 Interviewees.propTypes = {
-  users: PropTypes.arrayOf(
-    PropTypes.shape({ userId: PropTypes.string }),
-  ).isRequired,
+  userIds: PropTypes.arrayOf(PropTypes.string).isRequired,
   updateEventInfo: PropTypes.func.isRequired,
 };
 

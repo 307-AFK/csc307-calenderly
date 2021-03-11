@@ -13,9 +13,12 @@ module.exports.getEvents = async (req, res) => {
 
 module.exports.getEvent = async (req, res) => {
   if (mongoose.Types.ObjectId.isValid(req.params.eventid)) {
-    const e = await Event.findById(req.params.eventid);
+    const e = await Event
+      .findById(req.params.eventid)
+      .populate('interviewees.userId interviewees.interviewers');
+
     if (e) {
-      res.send(e);
+      res.json(e);
     } else {
       res.status(404).send('Event not found');
     }
@@ -285,17 +288,72 @@ module.exports.updateEvent = async (req, res) => {
   if (mongoose.Types.ObjectId.isValid(req.params.eventid)) {
     const e = await Event.findById(req.params.eventid);
     if (e) {
-      console.log(e);
-      e.title = req.body.title;
-      e.description = req.body.description;
-      e.startDate = req.body.startDate;
-      e.endDate = req.body.endDate;
-      e.interviewersNeeded = req.body.interviewersNeeded;
+      if (req.body.title) {
+        e.title = req.body.title;
+      }
+      if (req.body.description) {
+        e.description = req.body.description;
+      }
+      if (req.body.startDate) {
+        e.startDate = req.body.startDate;
+      }
+      if (req.body.endDate) {
+        e.endDate = req.body.endDate;
+      }
+      if (req.body.interviewersNeeded) {
+        e.interviewersNeeded = req.body.interviewersNeeded;
+      }
       e.save().then(() => {
-        res.status(204).send({ message: 'Event updated', event: e });
+        res.status(200).send({ message: 'Event updated', event: e });
       });
     } else {
       res.status(404).send('Event not found');
     }
   }
+};
+
+module.exports.interviewViewee = async (req, res) => {
+  const { eventid, viewid } = req.params;
+  const { viewerid } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(eventid)) {
+    res.status(404).send('Invalid event id');
+    return;
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(viewid)
+    || !mongoose.Types.ObjectId.isValid(viewerid)) {
+    res.status(404).send('Event not found');
+    return;
+  }
+
+  // TODO make sure only viewers can interview
+  const e = await Event.findOneAndUpdate({
+    _id: eventid, interviewees: { $elemMatch: { _id: viewid } },
+  }, { $push: { 'interviewees.$.interviewers': viewerid } });
+
+  res.send(e);
+};
+
+module.exports.interviewVieweeRemove = async (req, res) => {
+  const { eventid, viewid } = req.params;
+  const { viewerid } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(eventid)) {
+    res.status(404).send('Invalid event id');
+    return;
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(viewid)
+    || !mongoose.Types.ObjectId.isValid(viewerid)) {
+    res.status(404).send('Event not found');
+    return;
+  }
+
+  // TODO make sure only viewers can interview
+  const e = await Event.findOneAndUpdate({
+    _id: eventid, interviewees: { $elemMatch: { _id: viewid } },
+  }, { $pull: { 'interviewees.$.interviewers': viewerid } });
+
+  res.send(e);
 };
