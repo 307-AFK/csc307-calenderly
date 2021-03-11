@@ -14,8 +14,29 @@ const eventData = {
   title: 'foo',
   description: 'bar',
   startDate: '2021-02-17T18:10:00.064Z',
-  endDate: '2021-03-17T18:10:00.064Z',
+  endDate: '2021-02-18T18:10:00.064Z',
 };
+
+const expectedTimeSlots = [
+  {
+    times: [
+      true, true,
+      true, false,
+      false, false,
+      false, false,
+    ],
+    date: '2021-02-17T18:10:00.064Z',
+  },
+  {
+    times: [
+      false, false,
+      true, true,
+      false, false,
+      false, false,
+    ],
+    date: '2021-02-18T18:10:00.064Z',
+  },
+];
 
 describe('Test event endpoints', () => {
   let testUser;
@@ -148,4 +169,48 @@ describe('Test event endpoints', () => {
     const res2 = await request.delete(`/events/${theEvent._id}`);
     expect(res2.status).toBe(204);
   });
+
+  it('test availability/timeslot functionalities', async () => {
+    const theEvent = (await request.post('/events').send(eventData)).body;
+    const creatorAvailId = theEvent.interviewers[0]._id;
+    // create another temp user to add to event (interviewer)
+    const newInterviewer = await new User({
+      name: 'new interviewer',
+      email: 'new.interviewer@gmail.com',
+    }).save();
+    await request.post(`/events/${theEvent._id}/interviewers`).send({ email: newInterviewer.email });
+    // create another temp user to add to event (interviewee)
+    const newInterviewee = await new User({
+      name: 'new interviewee',
+      email: 'new.interviewee@gmail.com',
+    }).save();
+    await request.post(`/events/${theEvent._id}/interviewees`).send({ email: newInterviewee.email });
+
+    // timeslots before anyone sets availability
+    const avail = (await request.get(`/events/${theEvent._id}/timeslots`)).body;
+    // adjust a couple to send as creator's avail
+    avail[0].times[0] = true;
+    avail[0].times[1] = true;
+    avail[0].times[2] = true;
+    avail[1].times[2] = true;
+    avail[1].times[3] = true;
+
+    await request.post(`/events/${theEvent._id}/availability`).send({ avail, availId: creatorAvailId });
+
+    // check timeSlot compilation
+    const timeSlots = (await request.get(`/events/${theEvent._id}/timeslots`)).body;
+    const timeSlotsNoIds = timeSlots.map((t) => ({ times: t.times, date: t.date }));
+    expect(JSON.stringify(timeSlotsNoIds)).toBe(JSON.stringify(expectedTimeSlots));
+
+    // deletes
+    const res = await request.delete(`/users/${newInterviewer._id}`);
+    expect(res.status).toBe(204);
+    const res2 = await request.delete(`/users/${newInterviewee._id}`);
+    expect(res2.status).toBe(204);
+    const res3 = await request.delete(`/events/${theEvent._id}`);
+    expect(res3.status).toBe(204);
+  });
 });
+
+// TODO: updateTimeSlot, deleteInterviewer, deleteInterviewee,
+//       updateEvent, interviewViewee, interviewVieweeRemove
