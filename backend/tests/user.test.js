@@ -127,4 +127,34 @@ describe('Test user endpoints', () => {
     const res3 = await request.delete(`/events/${eventAsInterviewee._id}`);
     expect(res3.status).toBe(204);
   });
+
+  // --- error testing ---
+  it('Get user, get users (error testing)', async () => {
+    // Test get user errors
+    const noUser = (await request.get('/users/ffffffffffffffffffffffff')).error;
+    expect(noUser.status).toBe(404);
+    expect(noUser.text).toBe('User not found');
+    const invalidIdUser = (await request.get('/users/invalid_id')).error;
+    expect(invalidIdUser.status).toBe(400);
+    expect(invalidIdUser.text).toBe('Invalid user id');
+  });
+
+  // /:userid/events
+  it('Get user events, get user events by role (error testing)', async () => {
+    // Test get user events errors
+    const noUser = (await request.get('/users/ffffffffffffffffffffffff/events')).error;
+    expect(noUser.status).toBe(404);
+    expect(noUser.text).toBe('User not found');
+    const invalidIdUser = (await request.get('/users/invalid_id/events')).error;
+    expect(invalidIdUser.status).toBe(400);
+    expect(invalidIdUser.text).toBe('Invalid user id');
+
+    // Test get user events by role errors
+    const invalidIdUser2 = (await request.get('/users/invalid_id/events/interviewer')).error;
+    expect(invalidIdUser2.status).toBe(400);
+    expect(invalidIdUser2.text).toBe('Invalid user id');
+    const invalidIdUser3 = (await request.get('/users/invalid_id/events/interviewee')).error;
+    expect(invalidIdUser3.status).toBe(400);
+    expect(invalidIdUser3.text).toBe('Invalid user id');
+  });
 });
