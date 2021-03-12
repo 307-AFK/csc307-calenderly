@@ -170,7 +170,7 @@ describe('Test event endpoints', () => {
     expect(res2.status).toBe(204);
   });
 
-  it('test availability/timeslot functionalities', async () => {
+  it('test availability/timeslot functionalities, deleteInterviwee/deleteInterviewer', async () => {
     const theEvent = (await request.post('/events').send(eventData)).body;
     const creatorAvailId = theEvent.interviewers[0]._id;
     // create another temp user to add to event (interviewer)
@@ -208,6 +208,18 @@ describe('Test event endpoints', () => {
     expect(updatedInterviewees
       .some((interviewee) => interviewee.userId === newInterviewee._id.toString() && interviewee.timeChosen === '2021-02-17T00:10:00.000Z')).toBe(true);
 
+    // delete an interviewee from the event
+    let updatedEvent = (await request.delete(`/events/${theEvent._id}/interviewees`)
+      .send({ userId: newInterviewee._id.toString() })).body;
+    expect(updatedEvent.interviewees
+      .some((interviewee) => interviewee.userId === newInterviewee._id.toString())).toBe(false);
+
+    // delete an interviewer from the event
+    updatedEvent = (await request.delete(`/events/${theEvent._id}/interviewers`)
+      .send({ userId: newInterviewer._id.toString() })).body;
+    expect(updatedEvent.interviewers
+      .some((interviewer) => interviewer.userId === newInterviewer._id.toString())).toBe(false);
+
     // deletes
     const res = await request.delete(`/users/${newInterviewer._id}`);
     expect(res.status).toBe(204);
@@ -218,5 +230,4 @@ describe('Test event endpoints', () => {
   });
 });
 
-// TODO: updateTimeSlot, deleteInterviewer, deleteInterviewee,
-//       updateEvent, interviewViewee, interviewVieweeRemove
+// TODO: updateEvent, interviewViewee, interviewVieweeRemove
