@@ -202,6 +202,12 @@ describe('Test event endpoints', () => {
     const timeSlotsNoIds = timeSlots.map((t) => ({ times: t.times, date: t.date }));
     expect(JSON.stringify(timeSlotsNoIds)).toBe(JSON.stringify(expectedTimeSlots));
 
+    // give the interviewee a time slot
+    await request.post(`/events/${theEvent._id}/timeslot`).send({ userId: newInterviewee._id, timeChosen: '2021-02-17T00:10:00.000Z' });
+    const updatedInterviewees = (await request.get(`/events/${theEvent._id}/interviewees`)).body;
+    expect(updatedInterviewees
+      .some((interviewee) => interviewee.userId === newInterviewee._id.toString() && interviewee.timeChosen === '2021-02-17T00:10:00.000Z')).toBe(true);
+
     // deletes
     const res = await request.delete(`/users/${newInterviewer._id}`);
     expect(res.status).toBe(204);
