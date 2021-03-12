@@ -92,6 +92,10 @@ describe('Test event endpoints', () => {
 
     const res1 = await request.delete(`/events/${theEvent._id}`);
     expect(res1.status).toBe(204);
+
+    const invalidEvent = (await request.get(`/events/123`)).error;
+    expect(invalidEvent.status).toBe(400);
+    expect(invalidEvent.text).toBe('Invalid event id');
   });
 
   it('Get all events', async () => {
@@ -144,11 +148,14 @@ describe('Test event endpoints', () => {
 
     const res2 = await request.delete(`/events/${theEvent._id}`);
     expect(res2.status).toBe(204);
+
+    const invalidInterviewer = (await request.get(`/events/123/interviewers`)).error;
+    expect(invalidInterviewer.status).toBe(400);
+    expect(invalidInterviewer.text).toBe('Invalid event id');
   });
 
   it('Add interviewee / Get event interviewees', async () => {
     const theEvent = (await request.post('/events').send(eventData)).body;
-
     // create another temp user to add to event
     const newInterviewee = await new User({
       name: 'new interviewee',
@@ -176,6 +183,11 @@ describe('Test event endpoints', () => {
 
     const res2 = await request.delete(`/events/${theEvent._id}`);
     expect(res2.status).toBe(204);
+
+    const invalidInterviewee = (await request.get(`/events/123/interviewees`)).error;
+    expect(invalidInterviewee.status).toBe(400);
+    expect(invalidInterviewee.text).toBe('Invalid event id');
+
   });
 
   it('test availability/timeslot functionalities, deleteInterviwee/deleteInterviewer, interviewViewee/interviewVieweeRemove', async () => {
