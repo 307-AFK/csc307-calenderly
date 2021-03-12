@@ -66,7 +66,7 @@ module.exports.createEvent = async (req, res) => {
       ).then((user) => {
         if (user) {
           res.status(201).send(event);
-        } 
+        }
       });
     } else {
       res.status(404).send('Couldn\'t create event');

@@ -166,6 +166,13 @@ describe('Test event endpoints', () => {
     // add same interviewee again
     const a2 = await request.post(`/events/${theEvent._id}/interviewees`).send({ email: newInterviewee.email });
     expect(a2.body.message).toBe('0 user(s) added successfully');
+    // error testing
+    const badEventId = (await request.post('/events/abc/interviewees').send({ email: newInterviewee.email })).error;
+    expect(badEventId.status).toBe(400);
+    expect(badEventId.text).toBe('Invalid event id');
+    const badEmail = (await request.post(`/events/${theEvent._id}/interviewees`).send({ email: 'no.user@gmail.com' })).error;
+    expect(badEmail.status).toBe(404);
+    expect(badEmail.text).toBe('No user exists with this email address');
 
     // make sure new interviewee is in event
     const updatedInterviewees = (await request.get(`/events/${theEvent._id}/interviewees`)).body;
@@ -235,6 +242,16 @@ describe('Test event endpoints', () => {
     let intervieweesViewers = updatedEvent.interviewees
       .find((i) => i.userId._id === newInterviewee._id.toString()).interviewers;
     expect(intervieweesViewers.some((ivr) => ivr._id === newInterviewer._id.toString())).toBe(true);
+    // error checking
+    let badEventId = (await request.post(`/events/abc/${intervieweeId}/interview`).send({ viewerid: newInterviewer._id })).error;
+    expect(badEventId.status).toBe(404);
+    expect(badEventId.text).toBe('Invalid event id');
+    let badViewId = (await request.post(`/events/${theEvent._id}/abc/interview`).send({ viewerid: newInterviewer._id })).error;
+    expect(badViewId.status).toBe(404);
+    expect(badViewId.text).toBe('Event not found');
+    let badViewerId = (await request.post(`/events/${theEvent._id}/${intervieweeId}/interview`).send({ viewerid: 'abc' })).error;
+    expect(badViewerId.status).toBe(404);
+    expect(badViewerId.text).toBe('Event not found');
 
     // remove newInterviewer as an interviewer for new Interviewee
     await request.delete(`/events/${theEvent._id}/${intervieweeId}/interview`).send({ viewerid: newInterviewer._id });
@@ -243,6 +260,16 @@ describe('Test event endpoints', () => {
       .find((i) => i.userId._id === newInterviewee._id.toString()).interviewers;
     expect(intervieweesViewers
       .some((ivr) => ivr._id === newInterviewer._id.toString())).toBe(false);
+    // error checking
+    badEventId = (await request.delete(`/events/abc/${intervieweeId}/interview`).send({ viewerid: newInterviewer._id })).error;
+    expect(badEventId.status).toBe(404);
+    expect(badEventId.text).toBe('Invalid event id');
+    badViewId = (await request.delete(`/events/${theEvent._id}/abc/interview`).send({ viewerid: newInterviewer._id })).error;
+    expect(badViewId.status).toBe(404);
+    expect(badViewId.text).toBe('Event not found');
+    badViewerId = (await request.delete(`/events/${theEvent._id}/${intervieweeId}/interview`).send({ viewerid: 'abc' })).error;
+    expect(badViewerId.status).toBe(404);
+    expect(badViewerId.text).toBe('Event not found');
 
     // delete an interviewee from the event
     updatedEvent = (await request.delete(`/events/${theEvent._id}/interviewees`)
@@ -265,7 +292,6 @@ describe('Test event endpoints', () => {
     expect(res3.status).toBe(204);
   });
 
-  // TODO: updateEvent
   it('test updateEvent', async () => {
     const theEvent = (await request.post('/events').send(eventData)).body;
     expect(theEvent._id).toBeDefined();
