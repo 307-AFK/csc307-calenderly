@@ -38,6 +38,14 @@ const expectedTimeSlots = [
   },
 ];
 
+const updatedEvent = {
+  title: 'update event',
+  description: 'update',
+  startDate: '2021-02-19T18:10:00.064Z',
+  endDate: '2021-02-22T18:10:00.064Z',
+  interviewersNeeded : 3,
+};
+
 describe('Test event endpoints', () => {
   let testUser;
   beforeAll(async () => {
@@ -245,6 +253,31 @@ describe('Test event endpoints', () => {
     const res3 = await request.delete(`/events/${theEvent._id}`);
     expect(res3.status).toBe(204);
   });
+
+  // TODO: updateEvent
+  it('test updateEvent', async () => {
+    const theEvent = (await request.post('/events').send(eventData)).body;
+    expect(theEvent._id).toBeDefined();
+    expect(theEvent.title).toBe(eventData.title);
+    expect(theEvent.description).toBe(eventData.description);
+    expect(theEvent.startDate).toBe(eventData.startDate);
+    expect(theEvent.endDate).toBe(eventData.endDate);
+    expect(theEvent.interviewers[0].userId).toBe(eventData.eventCreator);
+  
+    const newEvent = (await request.put(`/events/${theEvent._id}/update`).send(updatedEvent)).body;
+    expect(newEvent.event.title).toBe(updatedEvent.title);
+    expect(newEvent.event.description).toBe(updatedEvent.description);
+    expect(newEvent.event.startDate).toBe(updatedEvent.startDate);
+    expect(newEvent.event.endDate).toBe(updatedEvent.endDate);
+    expect(newEvent.event.interviewersNeeded).toBe(updatedEvent.interviewersNeeded);
+  
+    const theCreator = (await request.get(`/users/${testUser._id}`)).body;
+    expect(theCreator.events.some((e) => e.eventId === theEvent._id)).toBe(true);
+
+    const res1 = await request.delete(`/events/${theEvent._id}`);
+    expect(res1.status).toBe(204);
+  });
 });
 
-// TODO: updateEvent
+
+
