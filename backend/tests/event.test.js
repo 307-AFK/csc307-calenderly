@@ -38,12 +38,12 @@ const expectedTimeSlots = [
   },
 ];
 
-const updatedEvent = {
+const expectedUpdatedEvent = {
   title: 'update event',
   description: 'update',
   startDate: '2021-02-19T18:10:00.064Z',
   endDate: '2021-02-22T18:10:00.064Z',
-  interviewersNeeded : 3,
+  interviewersNeeded: 3,
 };
 
 describe('Test event endpoints', () => {
@@ -93,7 +93,7 @@ describe('Test event endpoints', () => {
     const res1 = await request.delete(`/events/${theEvent._id}`);
     expect(res1.status).toBe(204);
 
-    const invalidEvent = (await request.get(`/events/123`)).error;
+    const invalidEvent = (await request.get('/events/123')).error;
     expect(invalidEvent.status).toBe(400);
     expect(invalidEvent.text).toBe('Invalid event id');
   });
@@ -149,7 +149,7 @@ describe('Test event endpoints', () => {
     const res2 = await request.delete(`/events/${theEvent._id}`);
     expect(res2.status).toBe(204);
 
-    const invalidInterviewer = (await request.get(`/events/123/interviewers`)).error;
+    const invalidInterviewer = (await request.get('/events/123/interviewers')).error;
     expect(invalidInterviewer.status).toBe(400);
     expect(invalidInterviewer.text).toBe('Invalid event id');
   });
@@ -184,10 +184,9 @@ describe('Test event endpoints', () => {
     const res2 = await request.delete(`/events/${theEvent._id}`);
     expect(res2.status).toBe(204);
 
-    const invalidInterviewee = (await request.get(`/events/123/interviewees`)).error;
+    const invalidInterviewee = (await request.get('/events/123/interviewees')).error;
     expect(invalidInterviewee.status).toBe(400);
     expect(invalidInterviewee.text).toBe('Invalid event id');
-
   });
 
   it('test availability/timeslot functionalities, deleteInterviwee/deleteInterviewer, interviewViewee/interviewVieweeRemove', async () => {
@@ -275,14 +274,14 @@ describe('Test event endpoints', () => {
     expect(theEvent.startDate).toBe(eventData.startDate);
     expect(theEvent.endDate).toBe(eventData.endDate);
     expect(theEvent.interviewers[0].userId).toBe(eventData.eventCreator);
-  
-    const newEvent = (await request.put(`/events/${theEvent._id}/update`).send(updatedEvent)).body;
-    expect(newEvent.event.title).toBe(updatedEvent.title);
-    expect(newEvent.event.description).toBe(updatedEvent.description);
-    expect(newEvent.event.startDate).toBe(updatedEvent.startDate);
-    expect(newEvent.event.endDate).toBe(updatedEvent.endDate);
-    expect(newEvent.event.interviewersNeeded).toBe(updatedEvent.interviewersNeeded);
-  
+
+    const newEvent = (await request.put(`/events/${theEvent._id}/update`).send(expectedUpdatedEvent)).body;
+    expect(newEvent.event.title).toBe(expectedUpdatedEvent.title);
+    expect(newEvent.event.description).toBe(expectedUpdatedEvent.description);
+    expect(newEvent.event.startDate).toBe(expectedUpdatedEvent.startDate);
+    expect(newEvent.event.endDate).toBe(expectedUpdatedEvent.endDate);
+    expect(newEvent.event.interviewersNeeded).toBe(expectedUpdatedEvent.interviewersNeeded);
+
     const theCreator = (await request.get(`/users/${testUser._id}`)).body;
     expect(theCreator.events.some((e) => e.eventId === theEvent._id)).toBe(true);
 
@@ -290,6 +289,3 @@ describe('Test event endpoints', () => {
     expect(res1.status).toBe(204);
   });
 });
-
-
-
