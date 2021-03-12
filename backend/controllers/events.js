@@ -19,8 +19,6 @@ module.exports.getEvent = async (req, res) => {
 
     if (e) {
       res.json(e);
-    } else {
-      res.status(404).send('Event not found');
     }
   } else {
     res.status(400).send('Invalid event id');
@@ -68,9 +66,7 @@ module.exports.createEvent = async (req, res) => {
       ).then((user) => {
         if (user) {
           res.status(201).send(event);
-        } else {
-          res.status(404).send('Created event, but couldn\'t update user');
-        }
+        } 
       });
     } else {
       res.status(404).send('Couldn\'t create event');
@@ -123,8 +119,6 @@ module.exports.getEventInterviewers = async (req, res) => {
       } else {
         res.status(404).send('Coudn\'t get event interviewers');
       }
-    } else {
-      res.status(404).send('Couldn\'t get event');
     }
   } else {
     res.status(400).send('Invalid event id');
@@ -137,11 +131,7 @@ module.exports.getEventInterviewees = async (req, res) => {
     if (e) {
       if (e.interviewees) {
         res.send(e.interviewees);
-      } else {
-        res.status(404).send('Coudn\'t get event interviewees');
       }
-    } else {
-      res.status(404).send('Couldn\'t get event');
     }
   } else {
     res.status(400).send('Invalid event id');
