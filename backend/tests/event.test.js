@@ -170,7 +170,7 @@ describe('Test event endpoints', () => {
     expect(res2.status).toBe(204);
   });
 
-  it('test availability/timeslot functionalities, deleteInterviwee/deleteInterviewer', async () => {
+  it('test availability/timeslot functionalities, deleteInterviwee/deleteInterviewer, interviewViewee/interviewVieweeRemove', async () => {
     const theEvent = (await request.post('/events').send(eventData)).body;
     const creatorAvailId = theEvent.interviewers[0]._id;
     // create another temp user to add to event (interviewer)
@@ -208,8 +208,25 @@ describe('Test event endpoints', () => {
     expect(updatedInterviewees
       .some((interviewee) => interviewee.userId === newInterviewee._id.toString() && interviewee.timeChosen === '2021-02-17T00:10:00.000Z')).toBe(true);
 
+    // sign up newInterviewer to interview newInterviewee
+    const intervieweeId = updatedInterviewees
+      .find((interviewee) => interviewee.userId === newInterviewee._id.toString())._id;
+    await request.post(`/events/${theEvent._id}/${intervieweeId}/interview`).send({ viewerid: newInterviewer._id });
+    let updatedEvent = (await request.get(`/events/${theEvent._id}`)).body;
+    let intervieweesViewers = updatedEvent.interviewees
+      .find((i) => i.userId._id === newInterviewee._id.toString()).interviewers;
+    expect(intervieweesViewers.some((ivr) => ivr._id === newInterviewer._id.toString())).toBe(true);
+
+    // remove newInterviewer as an interviewer for new Interviewee
+    await request.delete(`/events/${theEvent._id}/${intervieweeId}/interview`).send({ viewerid: newInterviewer._id });
+    updatedEvent = (await request.get(`/events/${theEvent._id}`)).body;
+    intervieweesViewers = updatedEvent.interviewees
+      .find((i) => i.userId._id === newInterviewee._id.toString()).interviewers;
+    expect(intervieweesViewers
+      .some((ivr) => ivr._id === newInterviewer._id.toString())).toBe(false);
+
     // delete an interviewee from the event
-    let updatedEvent = (await request.delete(`/events/${theEvent._id}/interviewees`)
+    updatedEvent = (await request.delete(`/events/${theEvent._id}/interviewees`)
       .send({ userId: newInterviewee._id.toString() })).body;
     expect(updatedEvent.interviewees
       .some((interviewee) => interviewee.userId === newInterviewee._id.toString())).toBe(false);
@@ -230,4 +247,4 @@ describe('Test event endpoints', () => {
   });
 });
 
-// TODO: updateEvent, interviewViewee, interviewVieweeRemove
+// TODO: updateEvent
