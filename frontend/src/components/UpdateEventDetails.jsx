@@ -14,7 +14,6 @@ const EventDetails = (props) => {
   const { updateEventInfo, eventInfo, eventId } = props;
 
   const onFinish = (values) => {
-    console.log(values);
     fetch(`${process.env.REACT_APP_SERVER_URL}/events/${eventId}/update`,
       {
         method: 'PUT',
