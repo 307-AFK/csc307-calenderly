@@ -1,0 +1,53 @@
+name: Running Tests
+
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
+
+jobs:
+  backend_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 14
+
+    - name: Install dependencies
+      working-directory: ./backend
+      run: yarn install
+
+    - name: Check the linter
+      working-directory: ./backend
+      run: yarn lint
+
+    - name: Run tests
+      working-directory: ./backend
+      env:
+        TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+        SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+        GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+        GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      run: yarn run jest
+
+  frontend_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 14
+
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: yarn install
+
+    - name: Check the linter
+      working-directory: ./frontend
+      run: yarn lint

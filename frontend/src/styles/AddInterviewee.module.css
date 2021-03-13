@@ -1,0 +1,23 @@
+.NewInterviewee {
+    position:relative;
+    left: 175px;
+    margin-bottom: 15px!important;
+}
+
+[title='New Interviewee'] {
+    color: white!important;
+}
+
+.but {
+    position:relative;
+    left: 168px;
+    background:white!important;
+    color: #6B9080!important;
+    border-radius:6px!important;
+}
+
+.head {
+    margin-top:10px!important;
+    text-align:center;
+    color:white;
+}

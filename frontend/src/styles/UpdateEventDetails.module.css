@@ -1,0 +1,84 @@
+h1.title {
+    text-align:center;
+    color:white;
+    font-family: Helvetica, sans-serif;
+    font-size:33px;
+    padding-top:10px;
+    margin: 0;
+    padding-bottom: 0;
+}
+
+.but {
+    size: medium;
+    background-color: white!important;
+    color: #6B9080!important;
+    position: relative;
+    left: 315px;
+    border-radius:6px!important;
+}
+
+.titleEntry {
+    width: 60%;
+    position: relative;
+    left: 150px;
+    margin: 0;
+    padding: 0;
+}
+
+[title="Event Title"] {
+    color: white!important;
+    position:relative;
+    left: 190px;
+}
+
+.dateRange {
+    width: 60%;
+    text-align:center;
+    position: relative;
+    left: 158px;;
+    padding-top: 0px;
+    margin: 0;
+    padding: 0;
+}
+
+[title="Start And End Dates"] {
+    color: white !important;
+    position:relative;
+    left: 157px;
+}
+
+.description {
+    width: 60%;
+    position: relative;
+    left: 150px;
+    margin: 0;
+    padding: 0;
+}
+
+[title="Description"] {
+    color: white !important;
+    position:relative;
+    left: 190px;
+}
+
+.interviewersNeeded {
+    width: 60%;
+    position: relative;
+    left: 150px;
+    margin: 0;
+    padding: 0;
+}
+
+[title="Interviewers Needed"] {
+    color: white !important;
+    position:relative;
+    left:162px;
+}
+
+input[type="text"]::placeholder {
+    text-align: center; 
+} 
+
+input[type="number"]::placeholder {
+    text-align: center; 
+} 

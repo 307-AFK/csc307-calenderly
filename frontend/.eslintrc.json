@@ -18,7 +18,9 @@
     "plugins": [
         "react"
     ],
+    "ignorePatterns": ["build/**"],
     "rules": {
+        "no-underscore-dangle": "off",
         "jsx-quotes": ["error", "prefer-single"]
     }
 }

@@ -1,0 +1,4 @@
+/* antd forces the !important :/ */
+.radioBlock {
+  display: block !important;
+}

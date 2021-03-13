@@ -7,7 +7,10 @@ const interviewerSchema = new mongoose.Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
-  availability: [Boolean],
+  availability: [{
+    date: Date,
+    times: [Boolean],
+  }],
 });
 
 const intervieweeSchema = new mongoose.Schema({
@@ -16,6 +19,10 @@ const intervieweeSchema = new mongoose.Schema({
     ref: 'User',
   },
   timeChosen: Date,
+  interviewers: [{
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  }],
 });
 
 const eventSchema = new mongoose.Schema({
@@ -25,8 +32,8 @@ const eventSchema = new mongoose.Schema({
   interviewees: [intervieweeSchema],
   startDate: Date,
   endDate: Date,
-  interviewersNeeded: Number,
-  availabilityIncrement: Number,
+  interviewersNeeded: { type: Number, default: 1 },
+  availabilityIncrement: { type: Number, default: 60 },
 });
 
 module.exports = mongoose.model('Event', eventSchema);
