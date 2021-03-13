@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
   events: [{ eventId: { type: Schema.Types.ObjectId, ref: 'Event' }, role: String }],
 });
 
-userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
 userSchema.plugin(findOrCreate);
 
 module.exports = mongoose.model('User', userSchema);
