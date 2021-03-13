@@ -28,7 +28,7 @@ jobs:
     - name: Run tests
       working-directory: ./backend
       env:
-        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
         SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
         GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
         GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
@@ -36,10 +36,6 @@ jobs:
 
   frontend_tests:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: 15.x
 
     steps:
     - uses: actions/checkout@v2
